@@ -1,3 +1,4 @@
+// noinspection JSUnusedGlobalSymbols
 export default {
   mounted() {
     let { title } = this.$options;
