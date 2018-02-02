@@ -6,7 +6,7 @@
   export default {
     name: 'error',
     title: 'Error',
-  }
+  };
 </script>
 
 <style scoped>
