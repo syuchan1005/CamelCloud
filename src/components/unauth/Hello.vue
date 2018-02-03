@@ -57,9 +57,14 @@
         button.focus();
       },
       clickLogin() {
-        this.$refs['id-input'].$el.focus();
-        this.user.pass = '';
-        this.$snotify.error('Invalid ID or Password.', 'Login Failed');
+        if (this.user.id && this.user.pass) {
+          this.$store.commit('token', this.user.id);
+          this.$router.push({ path: '/view' });
+        } else {
+          this.$refs['id-input'].$el.focus();
+          this.user.pass = '';
+          this.$snotify.error('Invalid ID or Password.', 'Login Failed');
+        }
       },
     },
   };

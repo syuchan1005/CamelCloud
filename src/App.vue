@@ -2,42 +2,42 @@
   <div id="app" :class="{ 'un-auth': !$route.meta.auth }">
     <div class="top">
       <div class="title">PicStorage</div>
-      <md-button class="md-raised">
+      <md-button class="md-raised" @click="clickLogout">
         <md-icon>exit_to_app</md-icon>
         Logout
       </md-button>
     </div>
 
     <md-list class="side" :data-side="list" v-if="!under480 || !$store.state.viewFilter">
-      <md-list-item @click="$store.state.viewFilter = 'all'" :disabled="$store.state.viewFilter === 'all'">
+      <md-list-item @click="$store.commit('viewFilter', 'all')" :disabled="$store.state.viewFilter === 'all'">
         <md-icon>photo_library</md-icon>
         <span>Camera Roll</span>
       </md-list-item>
 
       <md-divider class="mobile"/>
 
-      <md-list-item @click="$store.state.viewFilter = 'photo'" :disabled="$store.state.viewFilter === 'photo'">
+      <md-list-item @click="$store.commit('viewFilter', 'photo')" :disabled="$store.state.viewFilter === 'photo'">
         <md-icon>photo</md-icon>
         <span>Photos</span>
       </md-list-item>
 
       <md-divider class="mobile"/>
 
-      <md-list-item @click="$store.state.viewFilter = 'video'" :disabled="$store.state.viewFilter === 'video'">
+      <md-list-item @click="$store.commit('viewFilter', 'video')" :disabled="$store.state.viewFilter === 'video'">
         <md-icon>video_label</md-icon>
         <span>Videos</span>
       </md-list-item>
 
       <md-divider class="mobile"/>
 
-      <md-list-item @click="$store.state.viewFilter = 'favorite'" :disabled="$store.state.viewFilter === 'favorite'">
+      <md-list-item @click="$store.commit('viewFilter', 'favorite')" :disabled="$store.state.viewFilter === 'favorite'">
         <md-icon>star</md-icon>
         <span>Favorites</span>
       </md-list-item>
 
       <md-divider class="mobile"/>
 
-      <md-list-item @click="$store.state.viewFilter = 'delete'" :disabled="$store.state.viewFilter === 'delete'">
+      <md-list-item @click="$store.commit('viewFilter', 'delete')" :disabled="$store.state.viewFilter === 'delete'">
         <md-icon>delete</md-icon>
         <span>Recently Deleted</span>
       </md-list-item>
@@ -56,7 +56,7 @@
     </md-list>
 
     <md-button class="md-icon-button" v-show="under480 && $store.state.viewFilter"
-               @click="$store.state.viewFilter = undefined">
+               @click="$store.commit('viewFilter', undefined)">
       <md-icon>arrow_back</md-icon>
     </md-button>
 
@@ -83,14 +83,18 @@
     beforeDestroy() {
       window.removeEventListener('resize', this.handleResize);
     },
+    computed: {
+      under480() {
+        return this.innerWidth <= 480;
+      },
+    },
     methods: {
       handleResize() {
         this.innerWidth = window.innerWidth;
       },
-    },
-    computed: {
-      under480() {
-        return this.innerWidth <= 480;
+      clickLogout() {
+        this.$store.commit('token', undefined);
+        this.$router.push({ path: '/' });
       },
     },
   };
