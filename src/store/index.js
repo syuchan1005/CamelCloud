@@ -5,4 +5,9 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {},
+  getters: {
+    isLogin(/* state */) {
+      return true;
+    },
+  },
 });
