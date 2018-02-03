@@ -66,11 +66,13 @@
 </script>
 
 <style scoped lang="scss">
+  @import '../variables';
+
   .hello {
     width: 100%;
     height: 100%;
     color: white;
-    background: linear-gradient(#1D77EF, #83F3FE);
+    background: $gradientColor;
 
     display: flex;
     flex-direction: column;
