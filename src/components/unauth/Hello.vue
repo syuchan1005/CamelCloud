@@ -1,53 +1,72 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="http://chat.vuejs.org/" target="_blank" rel="noopener">Vue Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="http://vuejs-templates.github.io/webpack/" target="_blank" rel="noopener">Docs for This Template</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+    <div class="title">PicStorage</div>
+    <div class="sub-title">= picture + storage</div>
+    <div class="form">
+      <md-input-container>
+        <label>ID</label>
+        <md-input type="text" />
+      </md-input-container>
+      <md-input-container md-has-password>
+        <label>Password</label>
+        <md-input type="password" />
+      </md-input-container>
+      <md-button class="md-primary">Login</md-button>
+    </div>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'hello',
-  title: 'Hello',
-  data() {
-    return {
-      msg: 'Welcome to Your Vue.js PWA',
-    };
-  },
-};
+  export default {
+    name: 'hello',
+    title: 'Hello',
+    data() {
+      return {
+        user: {
+          id: '',
+          pass: '',
+        },
+      };
+    },
+  };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-h1, h2 {
-  font-weight: normal;
-}
+<style scoped lang="scss">
+  .hello {
+    width: 100%;
+    height: 100%;
+    color: white;
+    background: linear-gradient(#1D77EF, #83F3FE);
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
+  .title {
+    font-size: 3rem;
+    line-height: normal;
+  }
 
-a {
-  color: #35495E;
-}
+  .sub-title {
+    font-size: 1.2rem;
+    line-height: normal;
+  }
+
+  .form {
+    width: 40vw;
+    padding: 15px;
+    margin: 20px;
+
+    border-radius: 1%;
+    border: solid 2px white;
+    background-color: white;
+    color: black;
+    box-shadow: 4px 5px 5px -2px rgba(0, 0, 0, 0.3);
+
+    & > .md-button {
+      float: right;
+    }
+  }
 </style>
