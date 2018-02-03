@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import store from '@/store';
 import Hello from '@/components/unauth/Hello';
 import Error from '@/components/unauth/Error';
+import CameraRoll from '@/components/CameraRoll';
 
 Vue.use(Router);
 
@@ -19,6 +20,14 @@ const router = new Router({
       path: '*',
       name: 'Error',
       component: Error,
+    },
+    {
+      path: '/view',
+      name: 'CameraRoll',
+      component: CameraRoll,
+      meta: {
+        auth: true,
+      },
     },
   ],
 });
