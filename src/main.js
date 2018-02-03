@@ -4,6 +4,8 @@ import Vue from 'vue';
 import VueMaterial from 'vue-material';
 import 'vue-material/dist/vue-material.css';
 import 'material-design-icons/iconfont/material-icons.css';
+import Snotify, { SnotifyPosition } from 'vue-snotify';
+import 'vue-snotify/styles/material.css';
 import titleMixin from './mixin/title';
 import App from './App';
 import router from './router';
@@ -13,6 +15,11 @@ Vue.config.productionTip = false;
 Vue.mixin(titleMixin);
 
 Vue.use(VueMaterial);
+Vue.use(Snotify, {
+  toast: {
+    position: SnotifyPosition.rightTop,
+  },
+});
 
 /* eslint-disable no-new */
 new Vue({
