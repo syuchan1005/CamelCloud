@@ -2,7 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
 import VueMaterial from 'vue-material';
-import 'vue-material/dist/vue-material.min.css';
+import 'vue-material/dist/vue-material.css';
 import 'material-design-icons/iconfont/material-icons.css';
 import titleMixin from './mixin/title';
 import App from './App';
