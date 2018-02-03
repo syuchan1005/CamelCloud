@@ -11,6 +11,9 @@
   export default {
     name: 'select-mode',
     title: 'SelectMode',
+    mounted() {
+      if (window.innerWidth > 480) this.$store.state.viewFilter = 'all';
+    },
   };
 </script>
 

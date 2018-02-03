@@ -8,36 +8,36 @@
       </md-button>
     </div>
 
-    <md-list class="side" :data-side="list">
-      <md-list-item @click="$store.state.viewFilter = 'all'">
+    <md-list class="side" :data-side="list" v-if="!under480 || !$store.state.viewFilter">
+      <md-list-item @click="$store.state.viewFilter = 'all'" :disabled="$store.state.viewFilter === 'all'">
         <md-icon>photo_library</md-icon>
         <span>Camera Roll</span>
       </md-list-item>
 
       <md-divider class="mobile"/>
 
-      <md-list-item @click="$store.state.viewFilter = 'photo'">
+      <md-list-item @click="$store.state.viewFilter = 'photo'" :disabled="$store.state.viewFilter === 'photo'">
         <md-icon>photo</md-icon>
         <span>Photos</span>
       </md-list-item>
 
       <md-divider class="mobile"/>
 
-      <md-list-item @click="$store.state.viewFilter = 'video'">
+      <md-list-item @click="$store.state.viewFilter = 'video'" :disabled="$store.state.viewFilter === 'video'">
         <md-icon>video_label</md-icon>
         <span>Videos</span>
       </md-list-item>
 
       <md-divider class="mobile"/>
 
-      <md-list-item @click="$store.state.viewFilter = 'favorite'">
+      <md-list-item @click="$store.state.viewFilter = 'favorite'" :disabled="$store.state.viewFilter === 'favorite'">
         <md-icon>star</md-icon>
         <span>Favorites</span>
       </md-list-item>
 
       <md-divider class="mobile"/>
 
-      <md-list-item @click="$store.state.viewFilter = 'delete'">
+      <md-list-item @click="$store.state.viewFilter = 'delete'" :disabled="$store.state.viewFilter === 'delete'">
         <md-icon>delete</md-icon>
         <span>Recently Deleted</span>
       </md-list-item>
@@ -55,9 +55,15 @@
       </md-list-item>
     </md-list>
 
-    <main class="always">
+    <md-button class="md-icon-button" v-show="under480 && $store.state.viewFilter"
+               @click="$store.state.viewFilter = undefined">
+      <md-icon>arrow_back</md-icon>
+    </md-button>
+
+    <main class="always" v-if="!under480 || $route.path === '/' || (under480 && $store.state.viewFilter)">
       <router-view/>
     </main>
+
     <vue-snotify class="always"></vue-snotify>
   </div>
 </template>
@@ -68,7 +74,24 @@
     data() {
       return {
         list: 'left',
+        innerWidth: window.innerWidth,
       };
+    },
+    mounted() {
+      window.addEventListener('resize', this.handleResize);
+    },
+    beforeDestroy() {
+      window.removeEventListener('resize', this.handleResize);
+    },
+    methods: {
+      handleResize() {
+        this.innerWidth = window.innerWidth;
+      },
+    },
+    computed: {
+      under480() {
+        return this.innerWidth <= 480;
+      },
     },
   };
 </script>
@@ -135,15 +158,11 @@
 
   .side {
     width: 220px;
+    height: calc(100% - 3rem);
   }
 
   .side[data-side="left"] {
-    order: 1;
     border-right: solid $dividerColor 1px;
-  }
-
-  .side[data-side="left"] + main {
-    order: 2;
   }
 
   .side[data-side="right"] {
@@ -151,14 +170,18 @@
     border-left: solid $dividerColor 1px;
   }
 
-  .side[data-side="right"] + main {
-    order: 1;
+  .md-list-item.md-disabled {
+    background: rgba(0, 0, 0, 0.1);
   }
 
   @media all and (max-width: 480px) {
     .side {
       width: 100%;
-      height: 100%;
+    }
+
+    main {
+      width: 100%;
+      height: calc(100% - 3rem - 40px);
     }
 
     li > .md-button {
@@ -167,10 +190,6 @@
         width: 40px;
         height: 40px;
       }
-    }
-
-    main {
-      display: none;
     }
 
     .side-select {
