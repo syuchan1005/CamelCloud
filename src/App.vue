@@ -45,7 +45,7 @@
       <router-view/>
     </main>
 
-    <md-tabs md-centered class="md-transparent" data-side="center" v-show="list === 'center'" @change="(index) => $store.commit('viewFilter', filters[index].name)">
+    <md-tabs md-centered class="md-transparent" data-side="center" v-if="list === 'center'" @change="(index) => $store.commit('viewFilter', filters[index].name)">
       <md-tab v-for="(filter, index) in filters" :key="index"
               :md-active="$store.state.viewFilter === filter.name"
               :md-label="filter.label" :md-icon="filter.icon" />
@@ -117,6 +117,13 @@
         return ['/', '/login'].includes(this.$route.path);
       },
     },
+    watch: {
+      under480(oldVal, newVal) {
+        if (oldVal && !newVal) {
+          this.$store.commit('viewFilter', 'all');
+        }
+      },
+    },
     methods: {
       handleResize() {
         this.innerWidth = window.innerWidth;
@@ -132,6 +139,22 @@
 
 <style lang="scss">
   @import "components/variables";
+
+  .md-input {
+    font-size: 16px !important;
+  }
+
+  .md-tab-header > div {
+    text-transform: none;
+  }
+
+  .md-tabs {
+    height: 72px;
+  }
+
+  .md-tabs-content {
+    display: none;
+  }
 
   .un-auth {
     & > *:not(.always) {
@@ -232,18 +255,6 @@
     &  > .md-button > * {
       color: #3F51B5;
     }
-  }
-
-  .md-tab-header > div {
-    text-transform: none;
-  }
-
-  .md-tabs {
-    height: 72px;
-  }
-
-  .md-tabs-content {
-    display: none;
   }
 
   @media all and (max-width: 480px) {
