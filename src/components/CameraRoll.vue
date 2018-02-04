@@ -18,6 +18,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import 'general';
+
   .select-mode {
     width: 100%;
     height: 100%;
@@ -29,20 +31,6 @@
   }
 
   .empty {
-    text-align: center;
-
-    & > .md-icon {
-      width: 160px;
-      height: 160px;
-      font-size: 160px;
-      color: rgba(0, 0, 0, 0.26);
-    }
-
-    & > div {
-      font-size: 26px;
-      font-weight: 500;
-      line-height: 40px;
-      color: rgba(0, 0, 0, 0.87);
-    }
+    @include empty;
   }
 </style>

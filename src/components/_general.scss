@@ -1,0 +1,17 @@
+@mixin empty($iconSize:160px) {
+  text-align: center;
+
+  & > .md-icon {
+    width: $iconSize;
+    height: $iconSize;
+    font-size: $iconSize;
+    color: rgba(0, 0, 0, 0.26);
+  }
+
+  & > div {
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 40px;
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
