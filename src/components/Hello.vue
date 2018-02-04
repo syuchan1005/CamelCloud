@@ -71,7 +71,7 @@
 </script>
 
 <style scoped lang="scss">
-  @import '../variables';
+  @import 'variables';
 
   .hello {
     width: 100%;

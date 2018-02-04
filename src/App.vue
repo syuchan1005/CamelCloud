@@ -56,6 +56,7 @@
 </template>
 
 <script>
+  // noinspection JSUnusedGlobalSymbols
   export default {
     name: 'app',
     data() {
@@ -114,7 +115,7 @@
         return this.innerWidth <= 800;
       },
       noMenu() {
-        return ['/', '/login'].includes(this.$route.path);
+        return !this.$route.meta.menu;
       },
     },
     watch: {

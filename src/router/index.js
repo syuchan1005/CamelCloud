@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import store from '@/store';
-import Hello from '@/components/unauth/Hello';
-import Error from '@/components/unauth/Error';
+import Hello from '@/components/Hello';
+import Error from '@/components/Error';
 import CameraRoll from '@/components/CameraRoll';
 
 Vue.use(Router);
@@ -27,6 +27,7 @@ const router = new Router({
       component: CameraRoll,
       meta: {
         auth: true,
+        menu: true,
       },
     },
   ],
