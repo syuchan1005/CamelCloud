@@ -1,0 +1,12 @@
+{
+  "name": "pic_storage-server",
+  "version": "1.0.0",
+  "description": "PicStorage Backend",
+  "main": "index.js",
+  "author": "syuchan1005 <syuchan.dev@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "node index.js"
+  }
+}
