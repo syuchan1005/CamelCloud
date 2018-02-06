@@ -7,6 +7,25 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "node index.js"
+    "dev": "nodemon --watch src --exec babel-node src/index.js"
+  },
+  "dependencies": {
+    "graphql": "^0.12.3",
+    "koa": "^2.4.1",
+    "koa-bodyparser": "^4.2.0",
+    "koa-graphql": "^0.7.3",
+    "koa-passport": "^4.0.1",
+    "koa-router": "^7.4.0",
+    "koa-session": "^5.8.1",
+    "koa-static": "^4.0.2",
+    "koa2-connect-history-api-fallback": "^0.0.6",
+    "passport-twitter": "^1.0.4"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-env": "^2.4.1",
+    "eslint": "^4.17.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "nodemon": "^1.14.12"
   }
 }
