@@ -11,6 +11,13 @@ module.exports = {
     },
     facebook: {
       enable: false,
+      appID: '...',
+      appSecret: '...',
+    },
+    instagram: {
+      enable: false,
+      clientID: '...',
+      clientSecret: '...',
     },
   },
 };
