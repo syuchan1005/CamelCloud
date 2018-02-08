@@ -22,7 +22,8 @@
     "passport-facebook": "^2.1.1",
     "passport-instagram": "^1.0.0",
     "passport-local": "^1.0.0",
-    "passport-twitter": "^1.0.4"
+    "passport-twitter": "^1.0.4",
+    "sequelize": "^4.33.0"
   },
   "devDependencies": {
     "babel": "^6.23.0",
