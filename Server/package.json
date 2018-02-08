@@ -19,11 +19,16 @@
     "koa-session": "^5.8.1",
     "koa-static": "^4.0.2",
     "koa2-connect-history-api-fallback": "^0.0.6",
+    "mysql2": "^1.5.2",
     "passport-facebook": "^2.1.1",
     "passport-instagram": "^1.0.0",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.4",
-    "sequelize": "^4.33.0"
+    "pg": "^7.4.1",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.33.0",
+    "sqlite3": "^3.1.13",
+    "tedious": "^2.3.1"
   },
   "devDependencies": {
     "babel": "^6.23.0",
