@@ -1,0 +1,39 @@
+@startuml
+
+entity User {
+userId
+----
+----
+username
+hash
+dirId
+----
+twitterToken
+facebookToken
+instagramToken
+}
+
+entity File {
+fileId
+----
+----
+directoryId
+ownerId
+----
+type
+name
+}
+
+entity Directory {
+directoryId
+----
+----
+parentId
+ownerId
+----
+name
+}
+
+User -o Directory
+Directory --{ File
+@enduml

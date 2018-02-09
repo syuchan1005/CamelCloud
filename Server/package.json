@@ -10,6 +10,7 @@
     "dev": "nodemon --watch src --exec babel-node src/index.js"
   },
   "dependencies": {
+    "debug": "^3.1.0",
     "graphql": "^0.12.3",
     "koa": "^2.4.1",
     "koa-bodyparser": "^4.2.0",

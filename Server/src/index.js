@@ -1,3 +1,5 @@
+import opn from 'opn';
+import os from 'os';
 import Koa from 'koa';
 import BodyParser from 'koa-bodyparser';
 import Session from 'koa-session';
@@ -7,7 +9,6 @@ import koaPassport from 'koa-passport';
 import historyApiFallback from 'koa2-connect-history-api-fallback';
 import Passport from './Passport.mjs';
 import GraphQL from './GraphQL.mjs';
-
 import Config from './../../config';
 
 const app = new Koa();
@@ -53,4 +54,13 @@ app.use(router.routes());
 app.use(historyApiFallback());
 app.use(Serve(`${__dirname}/../../Client/dist`));
 
-app.listen(process.env.POST || 3000, () => console.log(`listen ${Config.baseURL}`));
+app.listen(process.env.POST || 3000, () => {
+  const osType = os.type().toString();
+  if (osType.match('Windows') !== null) {
+    opn(Config.baseURL, { app: ['chrome', '--incognito'] });
+  } else if (osType.match('Darwin') !== null) {
+    opn(Config.baseURL, { app: ['google chrome', '--incognito'] });
+  } else {
+    opn(Config.baseURL, { app: ['google-chrome', '--incognito'] });
+  }
+});
