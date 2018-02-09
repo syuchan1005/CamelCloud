@@ -26,7 +26,10 @@
       };
     },
     mounted() {
-      this.$http.post('/api');
+      this.$http.get('/api/auth').then((response) => {
+        this.$store.commit('setLogin', response.data);
+        this.$router.push('/view');
+      });
     },
   };
 </script>

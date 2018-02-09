@@ -2,7 +2,7 @@
   <div class="select-mode">
     <div class="empty">
       <md-icon>library_books</md-icon>
-      <div>Add your first photo</div>
+      <div class="title">Add your first photo</div>
     </div>
   </div>
 </template>
@@ -21,16 +21,6 @@
   @import 'general';
 
   .select-mode {
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .empty {
-    @include empty;
+    @include emptyWrapper;
   }
 </style>

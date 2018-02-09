@@ -7,19 +7,16 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     viewFilter: undefined,
-    token: undefined,
+    auth: {
+      login: false,
+    },
   },
   mutations: {
     viewFilter(state, type) {
       state.viewFilter = type;
     },
-    token(state, token) {
-      state.token = token;
-    },
-  },
-  getters: {
-    isLogin(state) {
-      return Boolean(state.token);
+    setLogin(state, login) {
+      state.auth.login = login;
     },
   },
 });

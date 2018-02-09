@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import store from '@/store';
 import Hello from '@/components/Hello';
+import Check from '@/components/Check';
 import Error from '@/components/Error';
 import CameraRoll from '@/components/CameraRoll';
 
@@ -15,6 +16,11 @@ const router = new Router({
       alias: '/login',
       name: 'Hello',
       component: Hello,
+    },
+    {
+      path: '/check',
+      name: 'Check',
+      component: Check,
     },
     {
       path: '*',
@@ -34,7 +40,7 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.auth && !store.getters.isLogin) {
+  if (to.meta.auth && !store.state.auth.login) {
     next({ path: '/login' });
   } else {
     next();

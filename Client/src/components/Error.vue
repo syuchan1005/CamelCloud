@@ -2,7 +2,7 @@
   <div class="error">
     <div class="empty">
       <md-icon>error_outline</md-icon>
-      <div>An error occurred</div>
+      <div class="title">An error occurred</div>
     </div>
     <md-button class="md-raised md-warn" @click="clickGo" ref="goButton">Go to TopPage</md-button>
     <span>Go after {{ time }} seconds</span>
@@ -29,7 +29,6 @@
     },
     methods: {
       clickGo() {
-        this.$store.commit('token', undefined);
         this.$store.commit('viewFilter', undefined);
         this.$router.push({ path: '/' });
       },
@@ -41,16 +40,6 @@
   @import 'general';
 
   .error {
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .empty {
-    @include empty;
+    @include emptyWrapper();
   }
 </style>
