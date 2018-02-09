@@ -16,6 +16,7 @@
     "epic-spinners": "^1.0.2",
     "material-design-icons": "^3.0.1",
     "vue": "^2.5.2",
+    "vue-awesome": "^2.3.4",
     "vue-axios": "^2.0.2",
     "vue-material": "0.8.1",
     "vue-router": "^3.0.1",

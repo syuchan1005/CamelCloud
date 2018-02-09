@@ -8,7 +8,9 @@ import Snotify, { SnotifyPosition } from 'vue-snotify';
 import 'vue-snotify/styles/material.css';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
-import titleMixin from './mixin/title';
+import Icon from 'vue-awesome/components/Icon';
+import AxiosMock from './modules/AxiosMock';
+import titleMixin from './modules/titleMixin';
 import App from './App';
 import router from './router';
 import store from './store';
@@ -22,7 +24,14 @@ Vue.use(Snotify, {
     position: SnotifyPosition.rightTop,
   },
 });
+if (process.env.NODE_ENV !== 'production') {
+  const mock = new AxiosMock(axios);
+  mock.login = false;
+}
 Vue.use(VueAxios, axios);
+
+Vue.component('icon', Icon);
+
 
 /* eslint-disable no-new */
 new Vue({
