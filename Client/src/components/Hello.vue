@@ -83,14 +83,12 @@
         }
       },
       authRequest(service) {
-        this.$http.get(`/api/auth/${service}`)
-          .catch((error) => {
-            if (error.response) {
-              this.$snotify.error('', `${error.response.status}`);
-            } else {
-              window.location.href = `/api/auth/${service}`;
-            }
-          });
+        if (location.protocol === 'http:' || service === 'instagram') {
+          window.location.href = `/api/auth/${service}`;
+        }
+        this.$http.get(`/api/auth/${service}`).catch((error) => {
+          this.$snotify.error('', `${error.response.status}`);
+        });
       },
     },
   };
