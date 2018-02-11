@@ -1,5 +1,6 @@
 import opn from 'opn';
 import os from 'os';
+import fs from 'fs';
 import Koa from 'koa';
 import BodyParser from 'koa-bodyparser';
 import Session from 'koa-session';
@@ -10,17 +11,29 @@ import historyApiFallback from 'koa2-connect-history-api-fallback';
 import Passport from './Passport.mjs';
 import GraphQL from './GraphQL.mjs';
 import Config from './../../config';
+import ServerConfig from '../config';
+import DBManager from './DBManager.mjs';
 
 const app = new Koa();
 
 app.keys = ['test'];
+
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    fs.unlinkSync('test.db');
+  } catch (e) {
+    console.log('not found file'); // eslint-disable-line
+  }
+}
 
 app.use(BodyParser());
 app.use(Session({}, app));
 app.use(koaPassport.initialize());
 app.use(koaPassport.session());
 
-const graphQL = new GraphQL();
+const db = new DBManager();
+const graphQL = new GraphQL(db);
+const passport = new Passport(db);
 
 const apiRouter = new Router();
 
@@ -32,7 +45,7 @@ apiRouter.all('/', async (ctx, next) => {
   }
 }, graphQL.http());
 
-const authRouter = new Passport().router;
+const authRouter = passport.router;
 authRouter.get('/', async (ctx) => {
   ctx.status = 200;
   ctx.body = ctx.isAuthenticated();
@@ -52,15 +65,26 @@ router.use('/api', apiRouter.routes(), apiRouter.allowedMethods());
 app.use(router.routes());
 
 app.use(historyApiFallback());
+app.use(async (ctx, next) => {
+  if (ctx.path === '/check') ctx.path = '/index.html';
+  console.log(ctx);
+  await next();
+});
 app.use(Serve(`${__dirname}/../../Client/dist`));
 
-app.listen(process.env.POST || 3000, () => {
-  const osType = os.type().toString();
-  if (osType.match('Windows') !== null) {
-    opn(Config.baseURL, { app: ['chrome', '--incognito'] });
-  } else if (osType.match('Darwin') !== null) {
-    opn(Config.baseURL, { app: ['google chrome', '--incognito'] });
-  } else {
-    opn(Config.baseURL, { app: ['google-chrome', '--incognito'] });
-  }
-});
+graphQL.db.authenticate()
+  .then(async () => {
+    app.listen(process.env.POST || 3000, () => {
+      if (ServerConfig.isOpenBrowser) {
+        const osType = os.type().toString();
+        if (osType.match('Windows') !== null) {
+          opn(Config.baseURL, { app: ['chrome', '--incognito'] });
+        } else if (osType.match('Darwin') !== null) {
+          opn(Config.baseURL, { app: ['google chrome', '--incognito'] });
+        } else {
+          opn(Config.baseURL, { app: ['google-chrome', '--incognito'] });
+        }
+      }
+    });
+    console.log(`listen: ${Config.baseURL}`);
+  });

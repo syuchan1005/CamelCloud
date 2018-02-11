@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import debug from 'debug';
+import crypto from 'crypto';
 
 import { databaseURI } from '../../config';
 
@@ -9,6 +10,7 @@ class DBManager {
     this.logging = debug('picstorage-db');
     this.db = new Sequelize(databaseURI, {
       logging: this.logging,
+      operatorsAliases: Sequelize.Op,
     });
   }
 
@@ -33,18 +35,17 @@ class DBManager {
         },
         hash: {
           type: Sequelize.TEXT,
-          allowNull: false,
         },
         dirId: {
           type: Sequelize.INTEGER,
         },
-        twitterToken: {
+        twitterId: {
           type: Sequelize.TEXT,
         },
-        facebookToken: {
+        facebookId: {
           type: Sequelize.TEXT,
         },
-        instagramToken: {
+        instagramId: {
           type: Sequelize.TEXT,
         },
       }),
@@ -100,6 +101,59 @@ class DBManager {
 
   syncModels() {
     return Promise.all(Object.values(this.models).map(v => v.sync()));
+  }
+
+  async getUser(userId) {
+    const user = await this.models.user.findOne({
+      where: {
+        userId,
+      },
+    });
+    return user ? user.dataValues : undefined;
+  }
+
+  async addUser(username, auth) {
+    let user = await this.models.user.create({ username });
+    const hash = DBManager.sha256(DBManager.sha256(username) + user.dataValues.createdAt);
+    const dir = await this.models.directory.create({
+      ownerId: user.dataValues.userId,
+      name: hash,
+    });
+
+    const data = auth;
+    if (data.password) {
+      let pass = data.password;
+      for (let i = 0; i < 2; i += 1) {
+        pass = DBManager.sha256(DBManager.sha256(pass) + user.dataValues.createdAt);
+      }
+      delete data.password;
+      data.hash = pass;
+    }
+
+    user = await user.update(Object.assign({
+      dirId: dir.dataValues.directoryId,
+    }, data));
+    return user.dataValues;
+  }
+
+  async findOrCreateUser(username, auth) {
+    let user = await this.models.user.findOne({
+      where: {
+        username,
+      },
+    });
+    if (user) {
+      user = user.dataValues;
+    } else {
+      user = await this.addUser(username, auth);
+    }
+    return user;
+  }
+
+  static sha256(text) {
+    const hash = crypto.createHash('sha256');
+    hash.update(text);
+    return hash.digest('hex');
   }
 }
 

@@ -124,7 +124,7 @@
     },
     watch: {
       under480(oldVal, newVal) {
-        if (oldVal && !newVal) {
+        if (oldVal && !newVal && !this.$store.state.viewFilter) {
           this.$store.commit('viewFilter', 'all');
         }
       },
@@ -134,7 +134,7 @@
         this.innerWidth = window.innerWidth;
       },
       clickLogout() {
-        this.$store.commit('token', undefined);
+        this.$store.commit('setLogin', false);
         this.$store.commit('viewFilter', undefined);
         this.$router.push({ path: '/' });
       },

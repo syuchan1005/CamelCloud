@@ -8,9 +8,9 @@ username
 hash
 dirId
 ----
-twitterToken
-facebookToken
-instagramToken
+twitterId
+facebookId
+instagramId
 }
 
 entity File {

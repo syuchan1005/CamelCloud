@@ -56,6 +56,9 @@
 </template>
 
 <script>
+  import sha256 from 'js-sha256';
+  import config from '../../../config';
+
   export default {
     name: 'hello',
     title: 'Hello',
@@ -75,7 +78,24 @@
       },
       clickLogin() {
         if (this.user.id && this.user.pass) {
-          this.$router.push({ path: '/view' });
+          let pass = this.user.pass;
+          for (let i = 0; i < config.auth.local.stretch; i += 1) {
+            pass = sha256(pass);
+          }
+          this.$http({
+            method: 'post',
+            url: '/api/auth/local',
+            data: {
+              username: this.user.id,
+              password: pass,
+            },
+          }).then(() => {
+            this.$store.commit('setLogin', true);
+            this.$router.push({ path: '/view' });
+          }).catch((err) => {
+            console.error(err);
+            this.$snotify.error(err);
+          });
         } else {
           this.$refs['id-input'].$el.focus();
           this.user.pass = '';
@@ -83,12 +103,13 @@
         }
       },
       authRequest(service) {
-        if (location.protocol === 'http:' || service === 'instagram') {
+        if (window.location.protocol === 'http:' || service === 'instagram') {
           window.location.href = `/api/auth/${service}`;
+        } else {
+          this.$http.get(`/api/auth/${service}`).catch((error) => {
+            this.$snotify.error('', `${error.response.status}`);
+          });
         }
-        this.$http.get(`/api/auth/${service}`).catch((error) => {
-          this.$snotify.error('', `${error.response.status}`);
-        });
       },
     },
   };

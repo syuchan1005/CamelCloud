@@ -16,16 +16,20 @@
     data() {
       return {
         time: 5,
+        after: undefined,
       };
     },
     mounted() {
-      const after = setInterval(() => {
+      this.after = setInterval(() => {
         this.time -= 1;
         if (this.time === 0) {
-          clearInterval(after);
+          clearInterval(this.after);
           this.$refs.goButton.$el.click();
         }
       }, 1000);
+    },
+    beforeDestroy() {
+      clearInterval(this.after);
     },
     methods: {
       clickGo() {

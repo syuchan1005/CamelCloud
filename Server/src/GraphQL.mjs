@@ -1,11 +1,9 @@
 import { buildSchema } from 'graphql';
 import graphqlHTTP from 'koa-graphql';
-import DBManager from './DBManager.mjs';
 
 class GraphQL {
-  constructor() {
-    this.db = new DBManager();
-    this.db.authenticate();
+  constructor(dbManager) {
+    this.db = dbManager;
     this.schema = buildSchema(`
       type Query {
         user(id: Int): User
@@ -25,6 +23,7 @@ class GraphQL {
       },
     };
   }
+
   http() {
     return graphqlHTTP({
       schema: this.schema,
