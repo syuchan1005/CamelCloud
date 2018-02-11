@@ -10,16 +10,23 @@ class GraphQL {
       }
       
       type User {
-        id: Int
-        name: String
+        userId: Int
+        username: String
+        password: String
+        dirId: Int
+        twitterId: Int
+        facebookId: Int
+        instagramId: Int
+        createdAt: String
+        updatedAt: String
       }
     `);
     this.root = {
-      user({ id }) {
-        return {
-          id,
-          name: `name-${id}`,
-        };
+      user: async ({ id }) => {
+        const user = await this.db.getUser(id);
+        user.password = Boolean(user.hash);
+        delete user.hash;
+        return user;
       },
     };
   }

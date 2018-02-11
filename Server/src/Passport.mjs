@@ -39,14 +39,21 @@ class Passport {
     passport.use(new LocalStrategy({
       usernameField: 'username',
       passwordField: 'password',
-    }, (username, password, done) => {
-      this.db.findOrCreateUser(username, {
-        password,
-      }).then((user) => {
-        done(null, user);
-      }).catch(err => done(err));
-    }));
-    this.router.post('/local', passport.authenticate('local', this.options));
+    }, (username, password, done) => this.db.findOrCreateUser(username, password)
+      .then(user => done(null, user)).catch(err => done(err))));
+    this.router.post('/local', async (ctx, next) => {
+      const authenticate = passport.authenticate('local', async (err, user) => {
+        if (user) {
+          await ctx.login(user);
+          ctx.status = 200;
+          ctx.body = 'OK';
+        } else {
+          ctx.status = 401;
+          ctx.body = 'User Not Found';
+        }
+      });
+      await authenticate(ctx, next);
+    });
   }
 
   twitter() {
@@ -55,11 +62,9 @@ class Passport {
       consumerSecret: auth.twitter.consumerSecret,
       callbackURL: `${Config.baseURL}/api/auth/twitter/callback`,
     }, (accessToken, tokenSecret, profile, done) => {
-      this.db.findOrCreateUser(profile.username, {
+      this.db.getUser({
         twitterId: profile.id,
-      }).then((user) => {
-        done(null, user);
-      }).catch(err => done(err));
+      }).then(user => done(null, user)).catch(err => done(err));
     }));
     this.router.get('/twitter', passport.authenticate('twitter'));
     this.router.get('/twitter/callback', passport.authenticate('twitter', this.options));
@@ -71,11 +76,9 @@ class Passport {
       clientSecret: auth.facebook.appSecret,
       callbackURL: `${Config.baseURL}/api/auth/facebook/callback`,
     }, (accessToken, refreshToken, profile, done) => {
-      this.db.findOrCreateUser(profile.displayName, {
+      this.db.getUser({
         facebookId: profile.id,
-      }).then((user) => {
-        done(null, user);
-      }).catch(err => done(err));
+      }).then(user => done(null, user)).catch(err => done(err));
     }));
     this.router.get('/facebook', passport.authenticate('facebook'));
     this.router.get('/facebook/callback', passport.authenticate('facebook', this.options));
@@ -87,11 +90,9 @@ class Passport {
       clientSecret: auth.instagram.clientSecret,
       callbackURL: `${Config.baseURL}/api/auth/instagram/callback`,
     }, (accessToken, refreshToken, profile, done) => {
-      this.db.findOrCreateUser(profile.username, {
+      this.db.getUser({
         instagramId: profile.id,
-      }).then((user) => {
-        done(null, user);
-      }).catch(err => done(err));
+      }).then(user => done(null, user)).catch(err => done(err));
     }));
     this.router.get('/instagram', passport.authenticate('instagram'));
     this.router.get('/instagram/callback', passport.authenticate('instagram', this.options));

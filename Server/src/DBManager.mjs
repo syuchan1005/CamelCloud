@@ -103,16 +103,17 @@ class DBManager {
     return Promise.all(Object.values(this.models).map(v => v.sync()));
   }
 
-  async getUser(userId) {
+  async getUser(auth) {
+    const where = typeof auth !== 'object' ? {
+      userId: auth,
+    } : auth;
     const user = await this.models.user.findOne({
-      where: {
-        userId,
-      },
+      where,
     });
     return user ? user.dataValues : undefined;
   }
 
-  async addUser(username, auth) {
+  async addUser(username, password) {
     let user = await this.models.user.create({ username });
     const hash = DBManager.sha256(DBManager.sha256(username) + user.dataValues.createdAt);
     const dir = await this.models.directory.create({
@@ -120,34 +121,33 @@ class DBManager {
       name: hash,
     });
 
-    const data = auth;
-    if (data.password) {
-      let pass = data.password;
-      for (let i = 0; i < 2; i += 1) {
-        pass = DBManager.sha256(DBManager.sha256(pass) + user.dataValues.createdAt);
-      }
-      delete data.password;
-      data.hash = pass;
-    }
-
-    user = await user.update(Object.assign({
+    const data = {
       dirId: dir.dataValues.directoryId,
-    }, data));
+      hash: DBManager.passwordStretch(password, user.dataValues.createdAt),
+    };
+
+    user = await user.update(data);
     return user.dataValues;
   }
 
-  async findOrCreateUser(username, auth) {
-    let user = await this.models.user.findOne({
-      where: {
-        username,
-      },
-    });
+  async findOrCreateUser(username, password) {
+    let user = await this.getUser({ username });
     if (user) {
-      user = user.dataValues;
+      if (user.hash !== DBManager.passwordStretch(password, user.createdAt)) {
+        throw new Error('User Not Found');
+      }
     } else {
-      user = await this.addUser(username, auth);
+      user = await this.addUser(username, password);
     }
     return user;
+  }
+
+  static passwordStretch(password, salt) {
+    let pass = password;
+    for (let i = 0; i < 2; i += 1) {
+      pass = DBManager.sha256(DBManager.sha256(pass) + salt);
+    }
+    return pass;
   }
 
   static sha256(text) {

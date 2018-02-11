@@ -48,7 +48,10 @@ apiRouter.all('/', async (ctx, next) => {
 const authRouter = passport.router;
 authRouter.get('/', async (ctx) => {
   ctx.status = 200;
-  ctx.body = ctx.isAuthenticated();
+  ctx.body = {
+    authed: ctx.isAuthenticated(),
+  };
+  if (ctx.isAuthenticated()) ctx.body.id = ctx.state.user.userId;
 });
 
 apiRouter.use('/auth', authRouter.routes(), authRouter.allowedMethods());
@@ -67,7 +70,6 @@ app.use(router.routes());
 app.use(historyApiFallback());
 app.use(async (ctx, next) => {
   if (ctx.path === '/check') ctx.path = '/index.html';
-  console.log(ctx);
   await next();
 });
 app.use(Serve(`${__dirname}/../../Client/dist`));
@@ -86,5 +88,5 @@ graphQL.db.authenticate()
         }
       }
     });
-    console.log(`listen: ${Config.baseURL}`);
+    console.log(`listen: ${Config.baseURL}`); // eslint-disable-line
   });
