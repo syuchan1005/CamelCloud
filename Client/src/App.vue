@@ -2,6 +2,10 @@
   <div id="app" :class="{ 'un-auth': !$route.meta.auth }">
     <div class="top">
       <div class="title">PicStorage</div>
+      <md-button class="md-raised">
+        <md-icon>settings</md-icon>
+        Setting
+      </md-button>
       <md-button class="md-raised" @click="clickLogout">
         <md-icon>exit_to_app</md-icon>
         Logout
@@ -197,8 +201,6 @@
     height: 3rem;
 
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
 
     background: $mainColor;
     color: white;
@@ -207,6 +209,10 @@
       font-size: 2rem;
       line-height: normal;
       margin-left: 10px;
+    }
+
+    .title + * {
+      margin-left: auto;
     }
   }
 
@@ -282,6 +288,26 @@
 
     .mobile {
       display: block;
+    }
+
+    .top {
+      .title + * {
+        min-width: 36px;
+        width: 36px;
+        padding: 0;
+        font-size: 0;
+      }
+    }
+  }
+
+  @media all and (max-width: 380px) {
+    .top {
+      .md-button + .md-button {
+        min-width: 36px;
+        width: 36px;
+        padding: 0;
+        font-size: 0;
+      }
     }
   }
 </style>
