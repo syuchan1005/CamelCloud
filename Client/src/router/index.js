@@ -43,7 +43,7 @@ const router = new Router({
       name: 'Setting',
       component: Setting,
       meta: {
-        /* auth: true, */
+        auth: true,
         header: true,
         redirect: '/view',
       },
