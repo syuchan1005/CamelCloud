@@ -9,14 +9,16 @@ export default new Vuex.Store({
     viewFilter: undefined,
     auth: {
       login: false,
+      userId: undefined,
     },
   },
   mutations: {
     viewFilter(state, type) {
       state.viewFilter = type;
     },
-    setLogin(state, login) {
-      state.auth.login = login;
+    setAuth(state, auth) {
+      state.auth.login = auth.authed;
+      state.auth.userId = auth.userId;
     },
   },
 });
