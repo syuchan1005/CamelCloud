@@ -27,7 +27,7 @@
     },
     mounted() {
       this.$http.get('/api/auth').then((response) => {
-        this.$store.commit('setLogin', response.data);
+        this.$store.commit('setAuth', response.data);
         this.$router.push('/view');
       });
     },

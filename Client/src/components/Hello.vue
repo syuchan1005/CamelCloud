@@ -4,15 +4,15 @@
     <div class="sub-title">= picture + storage</div>
     <div class="form">
       <md-input-container>
-        <label>ID</label>
-        <md-input type="text" v-model="user.id" ref="id-input"/>
+        <label>Username</label>
+        <md-input type="text" v-model="user.username" ref="id-input"/>
       </md-input-container>
       <md-input-container md-has-password>
         <label>Password</label>
-        <md-input type="password" v-model="user.pass" @keyup.native.enter="downEnter"/>
+        <md-input type="password" v-model="user.pass" @keyup.native.enter="downEnter" ref="pass-input"/>
       </md-input-container>
-      <md-button class="md-primary" @click="clickLogin" ref="loginButton">Login</md-button>
-      <div class="login-label">or login with</div>
+      <md-button class="md-primary" @click="clickLogin" ref="login-button">Sign in or Sign up</md-button>
+      <div class="login-label">or sign in with</div>
       <div class="auth">
         <md-button class="md-clean twitter" @click="authRequest('twitter')">
           <icon name="twitter" scale="2.5"/>
@@ -65,19 +65,19 @@
     data() {
       return {
         user: {
-          id: '',
+          username: '',
           pass: '',
         },
       };
     },
     methods: {
       downEnter() {
-        const button = this.$refs.loginButton.$el;
+        const button = this.$refs['login-button'].$el;
         button.click();
         button.focus();
       },
       clickLogin() {
-        if (this.user.id && this.user.pass) {
+        if (this.user.username && this.user.pass) {
           let pass = this.user.pass;
           for (let i = 0; i < config.auth.local.stretch; i += 1) {
             pass = sha256(pass);
@@ -86,18 +86,13 @@
             method: 'post',
             url: '/api/auth/local',
             data: {
-              username: this.user.id,
+              username: this.user.username,
               password: pass,
             },
-          }).then(() => {
-            this.$store.commit('setLogin', true);
-            this.$router.push({ path: '/view' });
-          }).catch((err) => {
-            console.error(err);
-            this.$snotify.error(err);
-          });
+          }).then(() => this.$router.push({ path: '/check' }))
+            .catch(err => this.$snotify.error(err));
         } else {
-          this.$refs['id-input'].$el.focus();
+          this.$refs[`${this.user.username ? 'pass' : 'id'}-input`].$el.focus();
           this.user.pass = '';
           this.$snotify.error('Invalid ID or Password.', 'Login Failed');
         }
