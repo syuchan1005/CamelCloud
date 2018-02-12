@@ -134,7 +134,7 @@
           login: false,
         });
         this.$store.commit('viewFilter', undefined);
-        this.$router.push({ path: '/' });
+        window.location.href = '/api/logout';
       },
     },
   };

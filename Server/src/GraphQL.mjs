@@ -5,14 +5,6 @@ class GraphQL {
   constructor(dbManager) {
     this.db = dbManager;
     this.schema = buildSchema(`
-      type Query {
-        getUser(id: Int!): User
-      }
-      
-      type Mutation {
-        setUser(userData: UpdateUser!): User
-      }
-      
       type User {
         userId: Int
         username: String
@@ -25,24 +17,29 @@ class GraphQL {
         updatedAt: String
       }
       
-      type UpdateUser {
-        userId: Int!
+      input UpdateUser {
         username: String
         password: String
       }
+    
+      type Mutation {
+        setUser(data: UpdateUser): User
+      }
+      
+      type Query {
+        getUser: User
+      }
     `);
     this.root = {
-      getUser: async ({ id }) => {
-        const user = await this.db.getUser(id);
+      getUser: async (args, ctx) => {
+        const user = await this.db.getUser(ctx.state.user.userId);
+        if (user === undefined) return undefined;
         user.password = Boolean(user.hash);
         delete user.hash;
         return user;
       },
-      setUser: async ({ userData }) => {
-        const data = userData;
-        delete data.userId;
-
-        const user = await this.db.updateUser(userData.userId, data);
+      setUser: async (args, ctx) => {
+        const user = await this.db.updateUser(ctx.state.user.userId, args.data);
         return user;
       },
     };

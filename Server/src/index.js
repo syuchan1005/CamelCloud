@@ -18,14 +18,6 @@ const app = new Koa();
 
 app.keys = ['test'];
 
-if (process.env.NODE_ENV !== 'production') {
-  try {
-    fs.unlinkSync('test.db');
-  } catch (e) {
-    console.log('not found file'); // eslint-disable-line
-  }
-}
-
 app.use(BodyParser());
 app.use(Session({}, app));
 app.use(koaPassport.initialize());

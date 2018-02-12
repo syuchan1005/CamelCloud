@@ -1,5 +1,10 @@
 <template>
   <div class="setting">
+    <router-link tag="md-button" to="/view" class="md-raised back">
+      <md-icon>arrow_back</md-icon>
+      Back
+    </router-link>
+
     <div class="holder username">
       <md-input-container>
         <label>Username</label>
@@ -14,7 +19,7 @@
     <div class="holder password">
       <md-input-container>
         <label>Password</label>
-        <md-input disabled :value='String(user.password)' />
+        <md-input disabled v-model='user.password' />
       </md-input-container>
       <md-button class="md-raised">
         <md-icon>build</md-icon>
@@ -25,7 +30,7 @@
     <div class="holder twitter">
       <md-input-container>
         <label>TwitterID</label>
-        <md-input disabled :value="user.twitterId" />
+        <md-input disabled v-model="user.twitterId" />
       </md-input-container>
       <md-button class="md-raised">
         <div class="stack-icon" v-if="user.twitterId">
@@ -40,7 +45,7 @@
     <div class="holder facebook">
       <md-input-container>
         <label>FacebookID</label>
-        <md-input disabled :value="user.facebookId" />
+        <md-input disabled v-model="user.facebookId" />
       </md-input-container>
       <md-button class="md-raised">
         <div class="stack-icon" v-if="user.facebookId">
@@ -55,7 +60,7 @@
     <div class="holder instagram">
       <md-input-container>
         <label>InstagramID</label>
-        <md-input disabled :value="user.instagramId" />
+        <md-input disabled v-model="user.instagramId" />
       </md-input-container>
       <md-button class="md-raised">
         <div class="stack-icon" v-if="user.instagramId">
@@ -82,10 +87,10 @@
         method: 'post',
         url: '/api',
         data: {
-          query: `{getUser(id:${this.$store.state.auth.userId}){username password twitterId facebookId instagramId}}`,
+          query: 'query{getUser{username password twitterId facebookId instagramId}}',
         },
       }).then((response) => {
-        this.user = response.data;
+        this.user = response.data.data.getUser;
       });
     },
   };
@@ -94,6 +99,10 @@
 <style lang="scss" scoped>
   .setting {
     padding: 20px;
+  }
+
+  .back {
+    margin-bottom: 10px;
   }
 
   .holder {
