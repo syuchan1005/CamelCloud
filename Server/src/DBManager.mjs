@@ -113,6 +113,18 @@ class DBManager {
     return user ? user.dataValues : undefined;
   }
 
+  async updateUser(userId, userData) {
+    let user = await this.getUser(userId);
+    const data = userData;
+    if (data.password) {
+      data.hash = DBManager.sha256(DBManager.sha256(userData.username || user.username)
+        + user.dataValues.createdAt);
+      delete data.password;
+    }
+    user = await user.update(data);
+    return user.dataValues;
+  }
+
   async addUser(username, password) {
     let user = await this.models.user.create({ username });
     const hash = DBManager.sha256(DBManager.sha256(username) + user.dataValues.createdAt);

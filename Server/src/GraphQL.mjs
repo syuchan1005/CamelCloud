@@ -6,7 +6,11 @@ class GraphQL {
     this.db = dbManager;
     this.schema = buildSchema(`
       type Query {
-        user(id: Int): User
+        getUser(id: Int!): User
+      }
+      
+      type Mutation {
+        setUser(userData: UpdateUser!): User
       }
       
       type User {
@@ -20,12 +24,25 @@ class GraphQL {
         createdAt: String
         updatedAt: String
       }
+      
+      type UpdateUser {
+        userId: Int!
+        username: String
+        password: String
+      }
     `);
     this.root = {
-      user: async ({ id }) => {
+      getUser: async ({ id }) => {
         const user = await this.db.getUser(id);
         user.password = Boolean(user.hash);
         delete user.hash;
+        return user;
+      },
+      setUser: async ({ userData }) => {
+        const data = userData;
+        delete data.userId;
+
+        const user = await this.db.updateUser(userData.userId, data);
         return user;
       },
     };
