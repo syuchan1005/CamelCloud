@@ -1,18 +1,18 @@
 <template>
-  <div id="app" :class="{ 'un-auth': !$route.meta.auth }">
-    <div class="top">
+  <div id="app">
+    <div class="top" v-if="$route.meta.header">
       <div class="title">PicStorage</div>
-      <md-button class="md-raised">
+      <router-link tag="md-button" class="md-raised" to="/setting">
         <md-icon>settings</md-icon>
         Setting
-      </md-button>
+      </router-link>
       <md-button class="md-raised" @click="clickLogout">
         <md-icon>exit_to_app</md-icon>
         Logout
       </md-button>
     </div>
 
-    <md-list class="side" :data-side="list" v-show="!under480 || !$store.state.viewFilter">
+    <md-list class="side" :data-side="list" v-if="$route.meta.menu" v-show="!under480 || !$store.state.viewFilter">
       <div v-for="(filter, index) in filters" :key="index">
         <md-list-item @click="$store.commit('viewFilter', filter.name)"
                       :disabled="$store.state.viewFilter === filter.name">
@@ -20,11 +20,11 @@
           <span>{{ filter.label }}</span>
         </md-list-item>
 
-        <md-divider class="mobile" v-show="filters.length - 1 !== index"/>
+        <md-divider class="mobile" v-if="under480"/>
       </div>
     </md-list>
 
-    <div class="side-select" v-show="!under800">
+    <div class="side-select" v-if="$route.meta.menu" v-show="!under800">
       <div>Menu</div>
       <md-button-toggle md-single class="md-primary">
         <md-button class="md-icon-button" :class="{ 'md-toggle': list === 'left' }" @click="listSide = 'left'">
@@ -39,28 +39,27 @@
       </md-button-toggle>
     </div>
 
-    <md-button class="md-icon-button" v-show="under480 && $store.state.viewFilter"
+    <md-button class="md-icon-button" v-if="$route.meta.menu" v-show="under480 && $store.state.viewFilter"
                @click="$store.commit('viewFilter', undefined)">
       <md-icon>arrow_back</md-icon>
     </md-button>
 
-    <main class="always" :class="{ [list] : !noMenu }"
-          v-show="!under480 || noMenu || (under480 && $store.state.viewFilter)">
+    <main :class="{ hasMenu : this.$route.meta.menu, hasHeader: this.$route.meta.header, [list]: this.$route.meta.menu }"
+          v-show="!under480 || !this.$route.meta.menu || (under480 && $store.state.viewFilter)">
       <router-view/>
     </main>
 
-    <md-tabs md-centered class="md-transparent" data-side="center" v-if="list === 'center'" @change="(index) => $store.commit('viewFilter', filters[index].name)">
+    <md-tabs md-centered class="md-transparent" data-side="center" v-if="$route.meta.menu && list === 'center'" @change="(index) => $store.commit('viewFilter', filters[index].name)">
       <md-tab v-for="(filter, index) in filters" :key="index"
               :md-active="$store.state.viewFilter === filter.name"
               :md-label="filter.label" :md-icon="filter.icon" />
     </md-tabs>
 
-    <vue-snotify class="always"></vue-snotify>
+    <vue-snotify></vue-snotify>
   </div>
 </template>
 
 <script>
-  // noinspection JSUnusedGlobalSymbols
   export default {
     name: 'app',
     data() {
@@ -94,7 +93,6 @@
           },
         ],
         innerWidth: window.innerWidth,
-        tabChange: undefined,
       };
     },
     mounted() {
@@ -118,9 +116,6 @@
       under800() {
         return this.innerWidth <= 800;
       },
-      noMenu() {
-        return !this.$route.meta.menu;
-      },
     },
     watch: {
       under480(oldVal, newVal) {
@@ -134,7 +129,10 @@
         this.innerWidth = window.innerWidth;
       },
       clickLogout() {
-        this.$store.commit('setLogin', false);
+        this.$store.commit('setAuth', {
+          userId: undefined,
+          login: false,
+        });
         this.$store.commit('viewFilter', undefined);
         this.$router.push({ path: '/' });
       },
@@ -145,35 +143,7 @@
 <style lang="scss">
   @import "components/variables";
 
-  .md-input {
-    font-size: 16px !important;
-  }
-
-  .md-tab-header > div {
-    text-transform: none;
-  }
-
-  .md-tabs {
-    height: 72px;
-  }
-
-  .md-tabs-content {
-    display: none;
-  }
-
-  .un-auth {
-    & > *:not(.always) {
-      display: none;
-    }
-
-    & > main {
-      display: block;
-      margin: 0;
-      width: 100%;
-      height: 100%;
-    }
-  }
-
+  /* Base */
   html, body, #app, main {
     margin: 0;
     width: 100%;
@@ -185,12 +155,20 @@
     flex-wrap: wrap;
   }
 
-  main {
-    width: calc(100% - 220px);
-    height: calc(100% - 3rem);
+  .md-input {
+    font-size: 16px !important;
   }
 
-  .mobile {
+  /* Menu Tab */
+  .md-tab-header > div {
+    text-transform: none;
+  }
+
+  .md-tabs {
+    height: 72px;
+  }
+
+  .md-tabs-content {
     display: none;
   }
 
@@ -229,13 +207,21 @@
     }
   }
 
-  .side[data-side="right"] + .side-select {
-    right: 10px;
+  main.hasMenu {
+    width: calc(100% - 220px);
+  }
+
+  main.hasHeader {
+    height: calc(100% - 3rem);
   }
 
   .side {
     width: 220px;
     height: calc(100% - 3rem);
+
+    .md-divider:last-child {
+      display: none;
+    }
   }
 
   .side[data-side="left"] {
@@ -270,8 +256,19 @@
     }
 
     main {
-      width: 100%;
-      height: calc(100% - 3rem - 40px);
+      width: 100% !important;
+
+      &.hasMenu.hasHeader {
+        height: calc(100% - 3rem - 40px) !important;
+      }
+
+      &.hasMenu {
+        height: calc(100% - 40px) !important;
+      }
+
+      &.hasHeader {
+        height: calc(100% - 3rem) !important;
+      }
     }
 
     li > .md-button {

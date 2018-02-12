@@ -32,9 +32,9 @@ Vue.use(Snotify, {
     position: SnotifyPosition.rightTop,
   },
 });
+
 if (process.env.NODE_ENV !== 'production') {
-  const mock = new AxiosMock(axios);
-  mock.login = false;
+  const mock = new AxiosMock(axios); // eslint-disable-line
 }
 Vue.use(VueAxios, axios);
 
