@@ -16,8 +16,8 @@ class Passport {
       ctx.body = Object.keys(auth).filter(type => auth[type].enable);
     });
 
-    passport.serializeUser(({ userId }, done) => {
-      done(null, userId);
+    passport.serializeUser((data, done) => {
+      done(null, data.userId);
     });
 
     passport.deserializeUser((userId, done) => {
@@ -26,7 +26,38 @@ class Passport {
 
     this.options = {
       failureRedirect: '/login',
-      successRedirect: '/check',
+      authRedirect: '/check',
+      updateRedirect: '/setting',
+    };
+
+    this.authRouter = ctx => async (err, user, info) => {
+      switch (info) {
+        case 'auth':
+          if (user) {
+            await ctx.login(user);
+            ctx.redirect(this.options.authRedirect);
+          } else {
+            ctx.redirect(this.options.failureRedirect);
+          }
+          break;
+        case 'update':
+          ctx.redirect(this.options.updateRedirect);
+          break;
+        default:
+          ctx.redirect(this.options.failureRedirect);
+      }
+    };
+
+    this.userCheck = (request, data, done) => {
+      if (request.user) {
+        this.db.updateUser(request.user.userId, data)
+          .then(user => done(null, user, 'update'))
+          .catch(err => done(err.message));
+      } else {
+        this.db.getUser(data)
+          .then(user => done(null, user, 'auth'))
+          .catch(err => done(err.message));
+      }
     };
 
     if (auth.local.enable) this.local();
@@ -40,7 +71,7 @@ class Passport {
       usernameField: 'username',
       passwordField: 'password',
     }, (username, password, done) => this.db.findOrCreateUser(username, password)
-      .then(user => done(null, user)).catch(err => done(err))));
+      .then(user => done(null, user)).catch(err => done(err.message))));
     this.router.post('/local', async (ctx, next) => {
       const authenticate = passport.authenticate('local', async (err, user) => {
         if (user) {
@@ -57,17 +88,18 @@ class Passport {
   }
 
   twitter() {
-    passport.use(new TwitterStrategy({
-      consumerKey: auth.twitter.consumerKey,
-      consumerSecret: auth.twitter.consumerSecret,
-      callbackURL: `${Config.baseURL}/api/auth/twitter/callback`,
-    }, (accessToken, tokenSecret, profile, done) => {
-      this.db.getUser({
-        twitterId: profile.id,
-      }).then(user => done(null, user)).catch(err => done(err));
-    }));
-    this.router.get('/twitter', passport.authenticate('twitter'));
-    this.router.get('/twitter/callback', passport.authenticate('twitter', this.options));
+    passport.use(
+      new TwitterStrategy({
+        consumerKey: auth.twitter.consumerKey,
+        consumerSecret: auth.twitter.consumerSecret,
+        callbackURL: `${Config.baseURL}/api/auth/twitter/callback`,
+        passReqToCallback: true,
+      }, (request, accessToken, tokenSecret, profile, done) =>
+        this.userCheck(request, { twitterId: profile.id }, done)));
+    this.router.get('/twitter', passport.authorize('twitter'));
+    this.router.get('/twitter/callback', async (ctx, next) => {
+      await passport.authorize('twitter', this.authRouter(ctx))(ctx, next);
+    });
   }
 
   facebook() {
@@ -75,13 +107,13 @@ class Passport {
       clientID: auth.facebook.appID,
       clientSecret: auth.facebook.appSecret,
       callbackURL: `${Config.baseURL}/api/auth/facebook/callback`,
-    }, (accessToken, refreshToken, profile, done) => {
-      this.db.getUser({
-        facebookId: profile.id,
-      }).then(user => done(null, user)).catch(err => done(err));
-    }));
-    this.router.get('/facebook', passport.authenticate('facebook'));
-    this.router.get('/facebook/callback', passport.authenticate('facebook', this.options));
+      passReqToCallback: true,
+    }, (request, accessToken, refreshToken, profile, done) =>
+      this.userCheck(request, { facebookId: profile.id }, done)));
+    this.router.get('/facebook', passport.authorize('facebook'));
+    this.router.get('/facebook/callback', async (ctx, next) => {
+      await passport.authorize('facebook', this.authRouter(ctx))(ctx, next);
+    });
   }
 
   instagram() {
@@ -89,13 +121,13 @@ class Passport {
       clientID: auth.instagram.clientID,
       clientSecret: auth.instagram.clientSecret,
       callbackURL: `${Config.baseURL}/api/auth/instagram/callback`,
-    }, (accessToken, refreshToken, profile, done) => {
-      this.db.getUser({
-        instagramId: profile.id,
-      }).then(user => done(null, user)).catch(err => done(err));
-    }));
-    this.router.get('/instagram', passport.authenticate('instagram'));
-    this.router.get('/instagram/callback', passport.authenticate('instagram', this.options));
+      passReqToCallback: true,
+    }, (request, accessToken, refreshToken, profile, done) =>
+      this.userCheck(request, { instagramId: profile.id }, done)));
+    this.router.get('/instagram', passport.authorize('instagram'));
+    this.router.get('/instagram/callback', async (ctx, next) => {
+      await passport.authorize('instagram', this.authRouter(ctx))(ctx, next);
+    });
   }
 }
 
