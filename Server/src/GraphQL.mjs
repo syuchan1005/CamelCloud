@@ -10,9 +10,9 @@ class GraphQL {
         username: String
         password: String
         dirId: Int
-        twitterId: Int
-        facebookId: Int
-        instagramId: Int
+        twitterId: String
+        facebookId: String
+        instagramId: String
         createdAt: String
         updatedAt: String
       }
@@ -30,18 +30,16 @@ class GraphQL {
         getUser: User
       }
     `);
+    // noinspection JSUnusedGlobalSymbols
     this.root = {
       getUser: async (args, ctx) => {
-        const user = await this.db.getUser(ctx.state.user.userId);
+        const user = await this.db.getUser(ctx.state.user.userId)
+          .catch(() => /* ignored */ undefined);
         if (user === undefined) return undefined;
         user.password = Boolean(user.hash);
-        delete user.hash;
         return user;
       },
-      setUser: async (args, ctx) => {
-        const user = await this.db.updateUser(ctx.state.user.userId, args.data);
-        return user;
-      },
+      setUser: async (args, ctx) => this.db.updateUser(ctx.state.user.userId, args.data),
     };
   }
 
