@@ -22,7 +22,7 @@ class AxiosMock {
           username: 'test',
           password: 'true',
           dirId: 1,
-          twitterId: null,
+          twitterId: '2548450969',
           facebookId: null,
           instagramId: null,
           createdAt: 'Mon Feb 12 2018 19:33:04 GMT+0900 (東京 (標準時))',

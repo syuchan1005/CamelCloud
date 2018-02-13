@@ -21,9 +21,16 @@ class GraphQL {
         username: String
         password: String
       }
+      
+      input clearAuth {
+        twitterId: Boolean
+        facebookId: Boolean
+        instagramId: Boolean
+      }
     
       type Mutation {
         setUser(data: UpdateUser): User
+        clearUserAuth(data: clearAuth): User
       }
       
       type Query {
@@ -40,6 +47,14 @@ class GraphQL {
         return user;
       },
       setUser: async (args, ctx) => this.db.updateUser(ctx.state.user.userId, args.data),
+      clearUserAuth: async (args, ctx) => {
+        const data = args.data;
+        Object.keys(data).forEach((key) => {
+          if (data[key] === true) data[key] = null;
+          else delete data[key];
+        });
+        return this.db.updateUser(ctx.state.user.userId, data);
+      },
     };
   }
 

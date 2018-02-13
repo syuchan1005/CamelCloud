@@ -19,7 +19,7 @@
     <div class="holder password">
       <md-input-container>
         <label>Password</label>
-        <md-input disabled v-model='user.password' />
+        <md-input disabled v-model='user.password'/>
       </md-input-container>
       <md-button class="md-raised">
         <md-icon>build</md-icon>
@@ -30,7 +30,7 @@
     <div class="holder twitter">
       <md-input-container>
         <label>TwitterID</label>
-        <md-input disabled v-model="user.twitterId" />
+        <md-input disabled v-model="user.twitterId"/>
       </md-input-container>
       <md-button class="md-raised" @click="authRequest('twitter')">
         <div class="stack-icon" v-if="user.twitterId">
@@ -45,7 +45,7 @@
     <div class="holder facebook">
       <md-input-container>
         <label>FacebookID</label>
-        <md-input disabled v-model="user.facebookId" />
+        <md-input disabled v-model="user.facebookId"/>
       </md-input-container>
       <md-button class="md-raised" @click="authRequest('facebook')">
         <div class="stack-icon" v-if="user.facebookId">
@@ -60,7 +60,7 @@
     <div class="holder instagram">
       <md-input-container>
         <label>InstagramID</label>
-        <md-input disabled v-model="user.instagramId" />
+        <md-input disabled v-model="user.instagramId"/>
       </md-input-container>
       <md-button class="md-raised" @click="authRequest('instagram')">
         <div class="stack-icon" v-if="user.instagramId">
@@ -95,7 +95,19 @@
     },
     methods: {
       authRequest(service) {
-        if (window.location.protocol === 'http:' || service === 'instagram') {
+        if (this.user[`${service}Id`]) {
+          this.$http({
+            method: 'post',
+            url: '/api',
+            data: {
+              query: 'mutation ClearUserAuth($input: clearAuth){clearUserAuth(data:$input)' +
+              '{username password twitterId facebookId instagramId}}',
+              variables: { input: { [`${service}Id`]: true } },
+            },
+          }).then((response) => {
+            this.user = response.data.data.clearUserAuth;
+          });
+        } else if (window.location.protocol === 'http:' || service === 'instagram') {
           window.location.href = `/api/auth/${service}`;
         } else {
           this.$http.get(`/api/auth/${service}`).catch((error) => {
