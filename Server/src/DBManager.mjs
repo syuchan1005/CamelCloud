@@ -41,12 +41,15 @@ class DBManager {
         },
         twitterId: {
           type: Sequelize.TEXT,
+          unique: true,
         },
         facebookId: {
           type: Sequelize.TEXT,
+          unique: true,
         },
         instagramId: {
           type: Sequelize.TEXT,
+          unique: true,
         },
       }),
       directory: this.db.define('Directory', {
@@ -104,17 +107,17 @@ class DBManager {
   }
 
   async getUser(auth) {
-    const where = typeof auth !== 'object' ? {
-      userId: auth,
-    } : auth;
-    const user = await this.models.user.findOne({
-      where,
-    });
-    return user ? user.dataValues : undefined;
+    const where = typeof auth !== 'object' ? { userId: auth } : auth;
+    const user = await this.models.user.findOne({ where });
+    return user ? user.dataValues : Promise.reject(new Error('User Not Found'));
   }
 
   async updateUser(userId, userData) {
-    let user = await this.getUser(userId);
+    let user = await this.models.user.findOne({
+      where: {
+        userId,
+      },
+    });
     const data = userData;
     if (data.password) {
       data.hash = DBManager.sha256(DBManager.sha256(userData.username || user.username)
@@ -143,10 +146,10 @@ class DBManager {
   }
 
   async findOrCreateUser(username, password) {
-    let user = await this.getUser({ username });
+    let user = await this.getUser({ username }).catch(() => /* ignored */ undefined);
     if (user) {
       if (user.hash !== DBManager.passwordStretch(password, user.createdAt)) {
-        throw new Error('User Not Found');
+        return Promise.reject(new Error('User Not Found'));
       }
     } else {
       user = await this.addUser(username, password);
