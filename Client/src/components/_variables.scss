@@ -1,9 +1,9 @@
 // Color
 $mainColor: #1D77EF;
-$gradientColor: linear-gradient($mainColor, #83F3FE);
+$subColor: #83F3FE;
+$gradientColor: linear-gradient($mainColor, $subColor);
 $dividerColor: rgba(0, 0, 0, 0.12);
 
 $twitterMain: #1DA1F2;
 $facebookMain: #3B5998;
-// $instagramBack: radial-gradient(#405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d, #f56040, #f77737, #fcaf45, #ffdc80);
-$instagramBack: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);;
+$instagramBack: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
