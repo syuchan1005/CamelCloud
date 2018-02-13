@@ -1,6 +1,5 @@
 import opn from 'opn';
 import os from 'os';
-import fs from 'fs';
 import Koa from 'koa';
 import BodyParser from 'koa-bodyparser';
 import Session from 'koa-session';
@@ -43,7 +42,7 @@ authRouter.get('/', async (ctx) => {
   ctx.body = {
     authed: ctx.isAuthenticated(),
   };
-  if (ctx.isAuthenticated()) ctx.body.id = ctx.state.user.userId;
+  if (ctx.isAuthenticated()) ctx.body.userId = ctx.state.user.userId;
 });
 
 apiRouter.use('/auth', authRouter.routes(), authRouter.allowedMethods());
@@ -57,7 +56,7 @@ const router = new Router();
 
 router.use('/api', apiRouter.routes(), apiRouter.allowedMethods());
 
-app.use(router.routes());
+app.use(router.routes(), router.allowedMethods());
 
 app.use(historyApiFallback());
 app.use(async (ctx, next) => {
