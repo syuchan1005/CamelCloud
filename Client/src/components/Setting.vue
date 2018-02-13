@@ -32,7 +32,7 @@
         <label>TwitterID</label>
         <md-input disabled v-model="user.twitterId" />
       </md-input-container>
-      <md-button class="md-raised">
+      <md-button class="md-raised" @click="authRequest('twitter')">
         <div class="stack-icon" v-if="user.twitterId">
           <md-icon>link</md-icon>
           <md-icon>clear</md-icon>
@@ -47,7 +47,7 @@
         <label>FacebookID</label>
         <md-input disabled v-model="user.facebookId" />
       </md-input-container>
-      <md-button class="md-raised">
+      <md-button class="md-raised" @click="authRequest('facebook')">
         <div class="stack-icon" v-if="user.facebookId">
           <md-icon>link</md-icon>
           <md-icon>clear</md-icon>
@@ -62,7 +62,7 @@
         <label>InstagramID</label>
         <md-input disabled v-model="user.instagramId" />
       </md-input-container>
-      <md-button class="md-raised">
+      <md-button class="md-raised" @click="authRequest('instagram')">
         <div class="stack-icon" v-if="user.instagramId">
           <md-icon>link</md-icon>
           <md-icon>clear</md-icon>
@@ -92,6 +92,17 @@
       }).then((response) => {
         this.user = response.data.data.getUser;
       });
+    },
+    methods: {
+      authRequest(service) {
+        if (window.location.protocol === 'http:' || service === 'instagram') {
+          window.location.href = `/api/auth/${service}`;
+        } else {
+          this.$http.get(`/api/auth/${service}`).catch((error) => {
+            this.$snotify.error('', `${error.response.status}`);
+          });
+        }
+      },
     },
   };
 </script>
