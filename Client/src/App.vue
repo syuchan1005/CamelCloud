@@ -59,6 +59,7 @@
   </div>
 </template>
 
+<!--suppress JSUnusedGlobalSymbols -->
 <script>
   export default {
     name: 'app',
@@ -129,12 +130,7 @@
         this.innerWidth = window.innerWidth;
       },
       clickLogout() {
-        this.$store.commit('setAuth', {
-          userId: undefined,
-          login: false,
-        });
-        this.$store.commit('viewFilter', undefined);
-        window.location.href = '/api/logout';
+        this.$router.push({ path: '/' });
       },
     },
   };

@@ -16,16 +16,18 @@ class AxiosMock {
       Location: '/',
     });
     this.mock.onPost('/api').reply(200, {
-      getUser: {
-        userId: 1,
-        username: 'test',
-        password: 'true',
-        dirId: 1,
-        twitterId: null,
-        facebookId: null,
-        instagramId: null,
-        createdAt: 'Mon Feb 12 2018 19:33:04 GMT+0900 (東京 (標準時))',
-        updatedAt: 'Mon Feb 12 2018 19:33:04 GMT+0900 (東京 (標準時))',
+      data: {
+        getUser: {
+          userId: 1,
+          username: 'test',
+          password: 'true',
+          dirId: 1,
+          twitterId: null,
+          facebookId: null,
+          instagramId: null,
+          createdAt: 'Mon Feb 12 2018 19:33:04 GMT+0900 (東京 (標準時))',
+          updatedAt: 'Mon Feb 12 2018 19:33:04 GMT+0900 (東京 (標準時))',
+        },
       },
     });
   }

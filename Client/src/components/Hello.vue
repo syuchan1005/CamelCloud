@@ -3,16 +3,20 @@
     <div class="title">PicStorage</div>
     <div class="sub-title">= picture + storage</div>
     <div class="form">
-      <md-input-container>
-        <label>Username</label>
-        <md-input type="text" v-model="user.username" ref="id-input"/>
-      </md-input-container>
-      <md-input-container md-has-password>
-        <label>Password</label>
-        <md-input type="password" v-model="user.pass" @keyup.native.enter="downEnter" ref="pass-input"/>
-      </md-input-container>
-      <md-button class="md-primary" @click="clickLogin" ref="login-button">Sign in or Sign up</md-button>
+      <form>
+        <md-input-container>
+          <label>Username</label>
+          <md-input type="text" autocomplete="username" v-model="user.username" ref="id-input"/>
+        </md-input-container>
+        <md-input-container md-has-password>
+          <label>Password</label>
+          <md-input type="password" autocomplete="password" v-model="user.pass" @keyup.native.enter="downEnter" ref="pass-input"/>
+        </md-input-container>
+        <md-button class="md-primary" @click="clickLogin" ref="login-button">Sign in or Sign up</md-button>
+      </form>
+
       <div class="login-label">or sign in with</div>
+
       <div class="auth">
         <md-button class="md-clean twitter" @click="authRequest('twitter')">
           <icon name="twitter" scale="2.5"/>
@@ -69,6 +73,16 @@
           pass: '',
         },
       };
+    },
+    mounted() {
+      this.$store.commit('setAuth', {
+        userId: undefined,
+        login: false,
+      });
+      this.$store.commit('viewFilter', undefined);
+      this.$http.get('/api/logout', {
+        maxRedirects: 0,
+      }).catch(() => undefined);
     },
     methods: {
       downEnter() {
@@ -148,7 +162,7 @@
     color: black;
     box-shadow: 0 3px 5px -1px rgba(0, 0, 0, .2), 0 5px 8px rgba(0, 0, 0, .14), 0 1px 14px rgba(0, 0, 0, .12);
 
-    & > .md-button {
+    form > .md-button {
       width: calc(100% - 15px);
     }
 
