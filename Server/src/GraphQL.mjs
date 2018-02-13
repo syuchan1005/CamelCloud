@@ -42,18 +42,17 @@ class GraphQL {
       getUser: async (args, ctx) => {
         const user = await this.db.getUser(ctx.state.user.userId)
           .catch(() => /* ignored */ undefined);
-        if (user === undefined) return undefined;
-        user.password = Boolean(user.hash);
-        return user;
+        return GraphQL.password(user);
       },
-      setUser: async (args, ctx) => this.db.updateUser(ctx.state.user.userId, args.data),
+      setUser: async (args, ctx) =>
+        GraphQL.password(await this.db.updateUser(ctx.state.user.userId, args.data)),
       clearUserAuth: async (args, ctx) => {
         const data = args.data;
         Object.keys(data).forEach((key) => {
           if (data[key] === true) data[key] = null;
           else delete data[key];
         });
-        return this.db.updateUser(ctx.state.user.userId, data);
+        return GraphQL.password(await this.db.updateUser(ctx.state.user.userId, data));
       },
     };
   }
@@ -64,6 +63,11 @@ class GraphQL {
       rootValue: this.root,
       graphiql: true,
     });
+  }
+
+  static password(user) {
+    if (user) user.password = !!user.hash; // eslint-disable-line
+    return user;
   }
 }
 
