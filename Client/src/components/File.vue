@@ -1,8 +1,22 @@
 <template>
-  <div class="file" @click="$emit('click', $event)">
+  <div class="file" @click="$emit('click', $event)" @contextmenu.stop.prevent="$refs.menu.open()">
     <div class="image" v-if="type === 'FILE'">Test</div>
     <icon class="image" v-else name="folder-open"/>
     <div class="name">{{ name }}</div>
+
+    <md-menu ref="menu">
+      <div md-menu-trigger></div>
+      <md-menu-content>
+        <md-menu-item @selected="$emit('rename', $event)">
+          <md-icon>create</md-icon>
+          <span>Rename</span>
+        </md-menu-item>
+        <md-menu-item @selected="$emit('remove', $event)">
+          <md-icon>delete</md-icon>
+          <span>Remove</span>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
   </div>
 </template>
 
@@ -23,6 +37,7 @@
 
 <style lang="scss" scoped>
   @import "general";
+  @import "variables";
 
   $size: 100px;
 
@@ -37,7 +52,7 @@
   }
 
   .file:hover {
-    background-color: rgba(111, 194, 255, 0.3);
+    background-color: rgba(136, 136, 136, 0.1);
   }
 
   .image {
@@ -49,6 +64,7 @@
   }
 
   .image.fa-icon {
+    color: $mainColor;
     padding: 5px 5px 5px 10px;
   }
 
