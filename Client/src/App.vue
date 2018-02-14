@@ -147,6 +147,7 @@
   }
 
   #app {
+    overflow: hidden;
     display: flex;
     flex-wrap: wrap;
   }

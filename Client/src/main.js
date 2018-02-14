@@ -16,6 +16,7 @@ import Icon from 'vue-awesome/components/Icon';
 import 'vue-awesome/icons/twitter';
 import 'vue-awesome/icons/facebook';
 import 'vue-awesome/icons/instagram';
+import 'vue-awesome/icons/folder-open';
 
 import AxiosMock from './modules/AxiosMock';
 import titleMixin from './modules/titleMixin';

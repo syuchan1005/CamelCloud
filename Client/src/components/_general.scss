@@ -29,3 +29,9 @@
     @include empty($iconSize);
   }
 }
+
+@mixin textEllipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
