@@ -7,15 +7,17 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "nodemon --watch src --exec cross-env NODE_ENV=development babel-node src/index.js",
+    "dev": "nodemon --watch src --exec cross-env NODE_ENV=development babel-node --inspect src/index.js",
     "lint": "eslint --ext .js,.mjs src"
   },
   "dependencies": {
     "debug": "^3.1.0",
+    "fs-extra": "^5.0.0",
     "graphql": "^0.12.3",
     "koa": "^2.4.1",
     "koa-bodyparser": "^4.2.0",
     "koa-graphql": "^0.7.3",
+    "koa-multer": "^1.0.2",
     "koa-passport": "^4.0.1",
     "koa-router": "^7.4.0",
     "koa-session": "^5.8.1",
