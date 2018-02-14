@@ -1,3 +1,4 @@
+import fs from 'fs-extra';
 import { buildSchema } from 'graphql';
 import graphqlHTTP from 'koa-graphql';
 
@@ -17,6 +18,16 @@ class GraphQL {
         updatedAt: String
       }
       
+      type File {
+        name: String
+        type: FileType
+      }
+      
+      enum FileType {
+        FILE
+        DIRECTORY
+      }
+      
       input UpdateUser {
         username: String
         password: String
@@ -28,13 +39,14 @@ class GraphQL {
         instagramId: Boolean
       }
     
+      type Query {
+        getUser: User
+        getFiles(path: String = ""): [File!]!
+      }
+      
       type Mutation {
         setUser(data: UpdateUser): User
         clearUserAuth(data: clearAuth): User
-      }
-      
-      type Query {
-        getUser: User
       }
     `);
     // noinspection JSUnusedGlobalSymbols
@@ -53,6 +65,18 @@ class GraphQL {
           else delete data[key];
         });
         return GraphQL.password(await this.db.updateUser(ctx.state.user.userId, data));
+      },
+      getFiles: async ({ path }, ctx) => {
+        const user = await this.db.getUser(ctx.state.user.userId);
+        const savePath = `../Storage/${user.dirName}/${path}`;
+        const files = await fs.readdir(savePath).catch(() => undefined);
+        if (files) {
+          return files.map(value => ({
+            name: value,
+            type: fs.statSync(`${savePath}/${value}`).isDirectory() ? 'DIRECTORY' : 'FILE',
+          }));
+        }
+        return [];
       },
     };
   }
