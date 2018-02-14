@@ -13,17 +13,6 @@ facebookId
 instagramId
 }
 
-entity File {
-fileId
-----
-----
-directoryId
-ownerId
-----
-type
-name
-}
-
 entity Directory {
 directoryId
 ----
@@ -35,5 +24,4 @@ name
 }
 
 User -o Directory
-Directory --{ File
 @enduml

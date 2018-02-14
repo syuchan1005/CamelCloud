@@ -73,32 +73,6 @@ class DBManager {
           unique: 'sameDirectory',
         },
       }),
-      file: this.db.define('File', {
-        fileId: {
-          type: Sequelize.INTEGER,
-          autoIncrement: true,
-          primaryKey: true,
-        },
-        directoryId: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          unique: 'sameFile',
-        },
-        ownerId: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          unique: 'sameFile',
-        },
-        fileType: {
-          type: Sequelize.TEXT,
-          allowNull: false,
-        },
-        name: {
-          type: Sequelize.TEXT,
-          allowNull: false,
-          unique: 'sameFile',
-        },
-      }),
     };
   }
 
