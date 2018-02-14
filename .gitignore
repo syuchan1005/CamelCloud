@@ -6,6 +6,7 @@ yarn-error.log*
 
 /config.js
 test.db
+/Storage
 
 # Editor directories and files
 .idea

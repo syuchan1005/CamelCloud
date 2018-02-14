@@ -9,7 +9,7 @@ class GraphQL {
         userId: Int
         username: String
         password: String
-        dirId: Int
+        dirName: String
         twitterId: String
         facebookId: String
         instagramId: String

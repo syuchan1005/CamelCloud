@@ -36,8 +36,8 @@ class DBManager {
         hash: {
           type: Sequelize.TEXT,
         },
-        dirId: {
-          type: Sequelize.INTEGER,
+        dirName: {
+          type: Sequelize.TEXT,
         },
         twitterId: {
           type: Sequelize.TEXT,
@@ -52,27 +52,6 @@ class DBManager {
           unique: true,
         },
       }),
-      directory: this.db.define('Directory', {
-        directoryId: {
-          type: Sequelize.INTEGER,
-          autoIncrement: true,
-          primaryKey: true,
-        },
-        parentId: {
-          type: Sequelize.INTEGER,
-          unique: 'sameDirectory',
-        },
-        ownerId: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          unique: 'sameDirectory',
-        },
-        name: {
-          type: Sequelize.TEXT,
-          allowNull: false,
-          unique: 'sameDirectory',
-        },
-      }),
     };
   }
 
@@ -83,7 +62,7 @@ class DBManager {
   async getUser(auth) {
     const where = typeof auth !== 'object' ? { userId: auth } : auth;
     const user = await this.models.user.findOne({ where });
-    return user ? user.dataValues : Promise.reject(new Error('User Not Found'));
+    return user || Promise.reject(new Error('User Not Found'));
   }
 
   async updateUser(userId, userData) {
@@ -95,28 +74,22 @@ class DBManager {
     const data = userData;
     if (data.password) {
       data.hash = DBManager.sha256(DBManager.sha256(userData.username || user.username)
-        + user.dataValues.createdAt);
+        + user.createdAt);
       delete data.password;
     }
     user = await user.update(data);
-    return user.dataValues;
+    return user;
   }
 
   async addUser(username, password) {
     let user = await this.models.user.create({ username });
-    const hash = DBManager.sha256(DBManager.sha256(username) + user.dataValues.createdAt);
-    const dir = await this.models.directory.create({
-      ownerId: user.dataValues.userId,
-      name: hash,
-    });
-
     const data = {
-      dirId: dir.dataValues.directoryId,
-      hash: DBManager.passwordStretch(password, user.dataValues.createdAt),
+      dirName: DBManager.sha256(DBManager.sha256(username) + user.createdAt),
+      hash: DBManager.passwordStretch(password, user.createdAt),
     };
 
     user = await user.update(data);
-    return user.dataValues;
+    return user;
   }
 
   async findOrCreateUser(username, password) {
