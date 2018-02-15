@@ -10,8 +10,12 @@
       </md-button>
     </div>
 
-
-    <div v-if="files.length" class="path">{{ path }}</div>
+    <div v-if="files.length" class="path">
+      <md-button :disabled="path === '> '" @click="backPath"><md-icon>arrow_back</md-icon></md-button>
+      <md-button @click="uploadFile"><md-icon>file_upload</md-icon></md-button>
+      <md-button @click="openNewDir"><md-icon>create_new_folder</md-icon></md-button>
+      <div class="value">{{ path }}</div>
+    </div>
 
     <vue-perfect-scrollbar v-if="files.length" class="files" @contextmenu.native.prevent="click($event)">
       <file @click="fileClick(file)" v-for="(file, index) in files" :key="index"
@@ -179,12 +183,17 @@
         }, false);
         element.click();
       },
+      backPath() {
+        const path = this.path;
+        if (path !== '> ') this.path = path.substring(0, path.length - path.match('> (?=(.*> ){1})(?!(.*> ){2})')[1].length);
+      },
     },
   };
 </script>
 
 <style lang="scss" scoped>
   @import 'general';
+  @import "variables";
 
   .md-menu {
     position: absolute;
@@ -203,13 +212,32 @@
   }
 
   .path {
-    margin: 10px;
-    width: calc(100% - 20px);
-    height: 22px;
-    border: solid 1px lightgray;
+    width: 100%;
+    height: 48px;
     padding: 0 5px;
-    @include textEllipsis;
-    @include disableSelect;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    .md-button {
+      width: 38px;
+      min-width: 38px;
+      padding: 0;
+      transform: scale(0.8);
+    }
+
+    .md-button:hover {
+      color: $mainColor;
+    }
+
+    .value {
+      width: 100%;
+      height: 22px;
+      padding-left: 5px;
+      border: solid 1px lightgray;
+      @include textEllipsis;
+      @include disableSelect;
+    }
   }
 
   .files {

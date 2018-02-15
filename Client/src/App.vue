@@ -41,7 +41,7 @@
 
     <md-button class="md-icon-button" v-if="$route.meta.menu" v-show="under480 && $store.state.viewFilter"
                @click="$store.commit('viewFilter', undefined)">
-      <md-icon>arrow_back</md-icon>
+      <md-icon>keyboard_arrow_left</md-icon>
     </md-button>
 
     <main :class="{ hasMenu : this.$route.meta.menu, hasHeader: this.$route.meta.header, [list]: this.$route.meta.menu }"
