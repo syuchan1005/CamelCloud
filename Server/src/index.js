@@ -74,7 +74,7 @@ apiRouter.post('/upload', async (ctx, next) => {
   } else {
     ctx.throw(401);
   }
-}, upload.single('photo'), async (ctx) => {
+}, upload.array('files'), async (ctx) => {
   ctx.status = 200;
 });
 

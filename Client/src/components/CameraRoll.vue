@@ -1,16 +1,17 @@
 <template>
-  <div class="select-mode" :class="{ empty: !files.length}">
+  <div class="select-mode" :class="{ empty: !files.length}" @dragover.prevent="drag = true" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)">
     <div class="empty" v-if="!files.length">
       <md-icon>library_books</md-icon>
       <div class="title">Add your first photo</div>
     </div>
-    <div v-else class="path">{{ path }}</div>
-    <vue-perfect-scrollbar class="files" @contextmenu.native.prevent="click($event)">
+    <div v-if="files.length" class="path">{{ path }}</div>
+
+    <vue-perfect-scrollbar v-if="files.length" class="files" @contextmenu.native.prevent="click($event)">
       <file @click="fileClick(file)" v-for="(file, index) in files" :key="index"
             :name="file.name" :type="file.type" @rename="renameFile(file)" @remove="removeFile(file)"/>
     </vue-perfect-scrollbar>
 
-    <md-menu md-size="4" ref="menu" :style="menu">
+    <md-menu v-if="files.length" md-size="4" ref="menu" :style="menu">
       <div md-menu-trigger></div>
 
       <md-menu-content>
@@ -23,6 +24,10 @@
 
     <md-dialog-prompt :md-title="dialog.title" :md-input-placeholder="dialog.placeholder"
                       :md-ok-text="dialog.okText" @close="closeDialog" v-model="dialog.value" ref="dialog"/>
+
+    <div class="drag" v-if="drag">
+      Drop your picture
+    </div>
   </div>
 </template>
 
@@ -53,6 +58,7 @@
           value: '',
           file: undefined,
         },
+        drag: false,
       };
     },
     mounted() {
@@ -136,6 +142,20 @@
         };
         this.$refs.dialog.open();
       },
+      dropFile(event) {
+        this.drag = false;
+        const formData = new FormData();
+        formData.append('path', this.path.replace(/> /g, '/'));
+        const files = event.dataTransfer.files;
+        for (let i = 0; i < files.length; i += 1) {
+          formData.append('files', files[i]);
+        }
+        this.$http({
+          method: 'post',
+          url: '/api/upload',
+          data: formData,
+        }).then(this.getFiles);
+      },
     },
   };
 </script>
@@ -173,5 +193,21 @@
 
   .file {
     margin: 10px;
+  }
+
+  .drag {
+    z-index: 5;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgba(0, 0, 0, 1);
+    background-color: rgba(0, 0, 0, 0.1);
+    font-size: 3rem;
   }
 </style>
