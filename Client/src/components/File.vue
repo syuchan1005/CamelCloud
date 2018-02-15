@@ -5,6 +5,7 @@
     <div class="name">{{ name }}</div>
 
     <md-menu ref="menu">
+      <!--suppress HtmlUnknownAttribute -->
       <div md-menu-trigger></div>
       <md-menu-content>
         <md-menu-item @selected="$emit('rename', $event)">
@@ -47,8 +48,7 @@
     height: $size + 20px;
     max-height: $size + 20px;
     cursor: default;
-    user-select: none;
-    -webkit-touch-callout: none;
+    @include disableSelect;
   }
 
   .file:hover {

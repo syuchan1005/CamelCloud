@@ -1,14 +1,16 @@
 <template>
-  <div class="select-mode" :class="{ empty: !files.length}" @dragover.prevent="drag = true" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)">
-    <div class="empty" v-if="!files.length">
+  <div class="select-mode" :class="{ empty: !files.length}" @dragover.prevent="drag = true">
+    <div class="empty" v-if="!files.length" @click="uploadFile">
       <md-icon>library_books</md-icon>
       <div class="title">Add your first photo</div>
 
-      <md-button class="md-raised newDir" @click="openNewDir">
+      <md-button class="md-raised newDir" @click.stop="openNewDir">
         <md-icon>add</md-icon>
         or create directory
       </md-button>
     </div>
+
+
     <div v-if="files.length" class="path">{{ path }}</div>
 
     <vue-perfect-scrollbar v-if="files.length" class="files" @contextmenu.native.prevent="click($event)">
@@ -16,7 +18,8 @@
             :name="file.name" :type="file.type" @rename="renameFile(file)" @remove="removeFile(file)"/>
     </vue-perfect-scrollbar>
 
-    <md-menu v-if="files.length" md-size="4" ref="menu" :style="menu">
+    <md-menu md-size="4" ref="menu" :style="menu">
+      <!--suppress HtmlUnknownAttribute -->
       <div md-menu-trigger></div>
 
       <md-menu-content>
@@ -30,7 +33,7 @@
     <md-dialog-prompt :md-title="dialog.title" :md-input-placeholder="dialog.placeholder"
                       :md-ok-text="dialog.okText" @close="closeDialog" v-model="dialog.value" ref="dialog"/>
 
-    <div class="drag" v-if="drag">
+    <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)">
       Drop your picture
     </div>
   </div>
@@ -70,7 +73,7 @@
       if (!this.under480 && !this.$store.state.viewFilter) {
         this.$store.commit('viewFilter', 'all');
       }
-      // this.getFiles();
+      this.getFiles();
     },
     watch: {
       path() {
@@ -164,6 +167,18 @@
           data: formData,
         }).then(this.getFiles);
       },
+      uploadFile() {
+        const element = document.createElement('input');
+        element.type = 'file';
+        element.addEventListener('change', () => {
+          this.dropFile({
+            dataTransfer: {
+              files: element.files,
+            },
+          });
+        }, false);
+        element.click();
+      },
     },
   };
 </script>
@@ -194,6 +209,7 @@
     border: solid 1px lightgray;
     padding: 0 5px;
     @include textEllipsis;
+    @include disableSelect;
   }
 
   .files {
@@ -208,8 +224,7 @@
   }
 
   .drag {
-    z-index: 5;
-    pointer-events: none;
+    z-index: 3;
     width: 100%;
     height: 100%;
     position: fixed;

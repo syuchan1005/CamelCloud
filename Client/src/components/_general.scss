@@ -1,5 +1,18 @@
+@mixin textEllipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@mixin disableSelect {
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 @mixin empty($iconSize:160px) {
   text-align: center;
+  cursor: pointer;
+  @include disableSelect;
 
   & > .md-icon {
     width: $iconSize;
@@ -28,10 +41,4 @@
   & > .empty {
     @include empty($iconSize);
   }
-}
-
-@mixin textEllipsis {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
