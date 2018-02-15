@@ -3,6 +3,11 @@
     <div class="empty" v-if="!files.length">
       <md-icon>library_books</md-icon>
       <div class="title">Add your first photo</div>
+
+      <md-button class="md-raised newDir" @click="openNewDir">
+        <md-icon>add</md-icon>
+        or create directory
+      </md-button>
     </div>
     <div v-if="files.length" class="path">{{ path }}</div>
 
@@ -62,7 +67,10 @@
       };
     },
     mounted() {
-      this.getFiles();
+      if (!this.under480 && !this.$store.state.viewFilter) {
+        this.$store.commit('viewFilter', 'all');
+      }
+      // this.getFiles();
     },
     watch: {
       path() {
@@ -173,6 +181,10 @@
 
   .select-mode.empty {
     @include emptyWrapper;
+  }
+
+  .empty > .newDir {
+    margin-top: 10px;
   }
 
   .path {
