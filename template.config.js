@@ -1,9 +1,9 @@
 module.exports = {
   baseURL: 'http://localhost:3000',
-  databaseURL: 'sqlite:data/db.sqlite3',
+  databaseURL: 'sqlite:test.db',
+  storage: '../Storage',
   auth: {
     local: {
-      enable: true,
       salt: 'passwordSalt',
       stretch: 1000,
     },

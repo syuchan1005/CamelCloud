@@ -60,7 +60,7 @@ class Passport {
       }
     };
 
-    if (auth.local.enable) this.local();
+    this.local();
     if (auth.twitter.enable) this.twitter();
     if (auth.facebook.enable) this.facebook();
     if (auth.instagram.enable) this.instagram();

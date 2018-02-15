@@ -29,7 +29,7 @@ const db = new DBManager();
 const uploadStorage = multer.diskStorage({
   async destination(request, file, callback) {
     const user = await db.getUser(request.user.userId);
-    const path = `../Storage/${user.dirName}/${request.body.path || ''}`;
+    const path = `${Config.storage}/${user.dirName}/${request.body.path || ''}`;
     await fs.ensureDir(path);
     callback(null, path);
   },
