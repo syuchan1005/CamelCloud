@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import { buildSchema } from 'graphql';
 import graphqlHTTP from 'koa-graphql';
+import Config from '../../config';
 
 class GraphQL {
   constructor(dbManager) {
@@ -28,6 +29,12 @@ class GraphQL {
         DIRECTORY
       }
       
+      enum FileOperations {
+        MKDIR
+        RENAME
+        REMOVE
+      }
+      
       input UpdateUser {
         username: String
         password: String
@@ -38,6 +45,13 @@ class GraphQL {
         facebookId: Boolean
         instagramId: Boolean
       }
+      
+      input opFile {
+        op: FileOperations!
+        path: String!
+        source: String!
+        target: String
+      }
     
       type Query {
         getUser: User
@@ -47,6 +61,7 @@ class GraphQL {
       type Mutation {
         setUser(data: UpdateUser): User
         clearUserAuth(data: clearAuth): User
+        operateFile(data:opFile): [File!]!
       }
     `);
     // noinspection JSUnusedGlobalSymbols
@@ -68,7 +83,7 @@ class GraphQL {
       },
       getFiles: async ({ path }, ctx) => {
         const user = await this.db.getUser(ctx.state.user.userId);
-        const savePath = `../Storage/${user.dirName}/${path}`;
+        const savePath = `${Config.storage}/${user.dirName}/${path}`;
         const files = await fs.readdir(savePath).catch(() => undefined);
         if (files) {
           return files.map(value => ({
@@ -77,6 +92,29 @@ class GraphQL {
           }));
         }
         return [];
+      },
+      operateFile: async ({ data }, ctx) => {
+        try {
+          const user = await this.db.getUser(ctx.state.user.userId);
+          switch (data.op) {
+            case 'MKDIR':
+              await fs.ensureDir(`${Config.storage}/${user.dirName}/${data.path}/${data.source}`);
+              break;
+            case 'RENAME':
+              await fs.rename(`${Config.storage}/${user.dirName}/${data.path}/${data.source}`, `${Config.storage}/${user.dirName}/${data.path}/${data.target}`);
+              break;
+            case 'REMOVE':
+              await fs.remove(`${Config.storage}/${user.dirName}${data.path}/${data.source}`);
+              break;
+            default:
+          }
+          return this.root.getFiles({
+            path: data.path,
+          }, ctx);
+        } catch (e) {
+          console.log(e);
+          return [];
+        }
       },
     };
   }
