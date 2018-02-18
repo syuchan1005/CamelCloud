@@ -1,25 +1,27 @@
 <template>
-  <div class="select-mode" :class="{ empty: !files.length}" @dragover.prevent="drag = true">
-    <div class="empty" v-if="!files.length" @click="uploadFile">
-      <md-icon>library_books</md-icon>
-      <div class="title">Add your first photo</div>
-
-      <md-button class="md-raised newDir" @click.stop="openNewDir">
-        <md-icon>add</md-icon>
-        or create directory
-      </md-button>
-    </div>
-
-    <div v-if="files.length" class="path">
+  <div class="select-mode" @dragover.prevent="drag = true">
+    <div v-if="path !== '> ' || files.length" class="path">
       <md-button :disabled="path === '> '" @click="backPath"><md-icon>arrow_back</md-icon></md-button>
       <md-button @click="uploadFile"><md-icon>file_upload</md-icon></md-button>
       <md-button @click="openNewDir"><md-icon>create_new_folder</md-icon></md-button>
       <div class="value">{{ path }}</div>
     </div>
 
+    <div class="empty-wrapper" v-if="!files.length" >
+      <div class="empty" @click="uploadFile">
+        <md-icon>library_books</md-icon>
+        <div class="title">Add your first photo</div>
+
+        <md-button class="md-raised newDir" @click.stop="openNewDir">
+          <md-icon>add</md-icon>
+          or create directory
+        </md-button>
+      </div>
+    </div>
+
     <vue-perfect-scrollbar v-if="files.length" class="files" @contextmenu.native.prevent="click($event)">
       <file @click="fileClick(file)" v-for="(file, index) in files" :key="index"
-            :name="file.name" :type="file.type" @rename="renameFile(file)" @remove="removeFile(file)"/>
+            :name="file.name" :type="file.type" @move="moveFile(file)" @rename="renameFile(file)" @remove="removeFile(file)"/>
     </vue-perfect-scrollbar>
 
     <md-menu md-size="4" ref="menu" :style="menu">
@@ -37,6 +39,8 @@
     <md-dialog-prompt :md-title="dialog.title" :md-input-placeholder="dialog.placeholder"
                       :md-ok-text="dialog.okText" @close="closeDialog" v-model="dialog.value" ref="dialog"/>
 
+    <select-directory-dialog v-model="dialog.value" ref="selDirDialog" @close="closeDialog"/>
+
     <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)">
       Drop your picture
     </div>
@@ -46,11 +50,13 @@
 <script>
   import VuePerfectScrollbar from 'vue-perfect-scrollbar';
   import File from './File';
+  import SelectDirectoryDialog from './SelectDirectoryDialog';
 
   export default {
     components: {
-      file: File,
+      File,
       VuePerfectScrollbar,
+      SelectDirectoryDialog,
     },
     name: 'select-mode',
     title: 'SelectMode',
@@ -90,7 +96,7 @@
           method: 'post',
           url: '/api',
           data: {
-            query: `query{getFiles(path: "${this.path.replace(/> /g, '/')}"){name type}}`,
+            query: `query{getFiles(path: "${this.path.replace(/[ ]?> /g, '/')}"){name type}}`,
           },
         }).then((response) => {
           this.files = response.data.data.getFiles;
@@ -110,12 +116,15 @@
         if (state !== 'ok') return;
         const input = {
           op: this.dialog.op,
-          path: this.path.replace(/> /g, '/'),
+          path: this.path.replace(/[ ]?> /g, '/'),
           source: this.dialog.value,
         };
         if (input.op === 'RENAME') {
           input.source = this.dialog.file;
           input.target = this.dialog.value;
+        } else if (input.op === 'MOVE') {
+          input.source = this.dialog.file;
+          input.target = this.dialog.value.replace(/[ ]?> /g, '/');
         }
         this.$http({
           method: 'post',
@@ -127,6 +136,15 @@
         }).then((response) => {
           this.files = response.data.data.operateFile;
         });
+      },
+      moveFile(file) {
+        this.dialog = {
+          op: 'MOVE',
+          okText: 'Move',
+          value: this.path,
+          file: file.name,
+        };
+        this.$refs.selDirDialog.open();
       },
       renameFile(file) {
         this.dialog = {
@@ -160,7 +178,7 @@
       dropFile(event) {
         this.drag = false;
         const formData = new FormData();
-        formData.append('path', this.path.replace(/> /g, '/'));
+        formData.append('path', this.path.replace(/[ ]?> /g, '/'));
         const files = event.dataTransfer.files;
         for (let i = 0; i < files.length; i += 1) {
           formData.append('files', files[i]);
@@ -185,7 +203,7 @@
       },
       backPath() {
         const path = this.path;
-        if (path !== '> ') this.path = path.substring(0, path.length - path.match('> (?=(.*> ){1})(?!(.*> ){2})')[1].length);
+        if (path !== '> ') this.path = path.substring(0, path.length - path.match('> (?=(.* > ){1})(?!(.* > ){2})')[1].length);
       },
     },
   };
@@ -203,7 +221,7 @@
     height: 100%;
   }
 
-  .select-mode.empty {
+  .empty-wrapper{
     @include emptyWrapper;
   }
 
@@ -242,13 +260,13 @@
 
   .files {
     width: 100%;
-    height: calc(100% - 42px);
+    height: calc(100% - 48px);
     display: flex;
     flex-wrap: wrap;
-  }
 
-  .file {
-    margin: 10px;
+    .file {
+      margin: 10px;
+    }
   }
 
   .drag {

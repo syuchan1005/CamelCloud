@@ -38,20 +38,20 @@ class AxiosMock {
           data: {
             getFiles: [
               {
-                name: 'test.png',
-                type: 'FILE',
-              },
-              {
                 name: 'test',
                 type: 'DIRECTORY',
               },
               {
-                name: 'test-longlonglonglongtext.png',
+                name: 'test-longlonglonglongtext',
+                type: 'DIRECTORY',
+              },
+              {
+                name: 'test.png',
                 type: 'FILE',
               },
               {
-                name: 'test-longlonglonglongtext',
-                type: 'DIRECTORY',
+                name: 'test-longlonglonglongtext.png',
+                type: 'FILE',
               },
             ],
           },
