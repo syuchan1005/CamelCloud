@@ -33,6 +33,13 @@ class GraphQL {
         MKDIR
         RENAME
         REMOVE
+        MOVE
+      }
+      
+      enum FileTypeFilter {
+        FILE
+        DIRECTORY
+        ALL
       }
       
       input UpdateUser {
@@ -55,13 +62,13 @@ class GraphQL {
     
       type Query {
         getUser: User
-        getFiles(path: String = ""): [File!]!
+        getFiles(path: String = "", fileType: FileTypeFilter = ALL): [File!]!
       }
       
       type Mutation {
         setUser(data: UpdateUser): User
         clearUserAuth(data: clearAuth): User
-        operateFile(data:opFile): [File!]!
+        operateFile(data: opFile, fileType: FileTypeFilter = ALL): [File!]!
       }
     `);
     // noinspection JSUnusedGlobalSymbols
@@ -81,19 +88,20 @@ class GraphQL {
         });
         return GraphQL.password(await this.db.updateUser(ctx.state.user.userId, data));
       },
-      getFiles: async ({ path }, ctx) => {
+      getFiles: async ({ path, fileType }, ctx) => {
         const user = await this.db.getUser(ctx.state.user.userId);
         const savePath = `${Config.storage}/${user.dirName}/${path}`;
         const files = await fs.readdir(savePath).catch(() => undefined);
         if (files) {
-          return files.map(value => ({
+          const map = files.map(value => ({
             name: value,
             type: fs.statSync(`${savePath}/${value}`).isDirectory() ? 'DIRECTORY' : 'FILE',
           }));
+          return fileType === 'ALL' ? map : map.filter(value => value.type === fileType);
         }
         return [];
       },
-      operateFile: async ({ data }, ctx) => {
+      operateFile: async ({ data, fileType }, ctx) => {
         try {
           const user = await this.db.getUser(ctx.state.user.userId);
           switch (data.op) {
@@ -101,18 +109,27 @@ class GraphQL {
               await fs.ensureDir(`${Config.storage}/${user.dirName}/${data.path}/${data.source}`);
               break;
             case 'RENAME':
-              await fs.rename(`${Config.storage}/${user.dirName}/${data.path}/${data.source}`, `${Config.storage}/${user.dirName}/${data.path}/${data.target}`);
+              await fs.rename(
+                `${Config.storage}/${user.dirName}/${data.path}/${data.source}`,
+                `${Config.storage}/${user.dirName}/${data.path}/${data.target}`,
+              );
               break;
             case 'REMOVE':
-              await fs.remove(`${Config.storage}/${user.dirName}${data.path}/${data.source}`);
+              await fs.remove(`${Config.storage}/${user.dirName}/${data.path}/${data.source}`);
+              break;
+            case 'MOVE':
+              await fs.move(
+                `${Config.storage}/${user.dirName}/${data.path}/${data.source}`,
+                `${Config.storage}/${user.dirName}/${data.target}/${data.source}`,
+              );
               break;
             default:
           }
           return this.root.getFiles({
             path: data.path,
+            fileType,
           }, ctx);
         } catch (e) {
-          console.log(e);
           return [];
         }
       },
