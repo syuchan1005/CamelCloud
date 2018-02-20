@@ -41,8 +41,8 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "general";
-  @import "variables";
+  @import "../general";
+  @import "../variables";
 
   $size: 100px;
 

@@ -44,6 +44,7 @@
       </md-menu-content>
     </md-menu>
 
+    <!--suppress RequiredAttributes -->
     <md-dialog-prompt :md-title="dialog.title" :md-input-placeholder="dialog.placeholder"
                       :md-ok-text="dialog.okText" @close="closeDialog" v-model="dialog.value" ref="dialog"/>
 
@@ -58,8 +59,8 @@
 <script>
   import VuePerfectScrollbar from 'vue-perfect-scrollbar';
   import Config from '../../../config';
-  import File from './File';
-  import SelectDirectoryDialog from './SelectDirectoryDialog';
+  import File from './modules/File';
+  import SelectDirectoryDialog from './modules/SelectDirectoryDialog';
 
   export default {
     components: {

@@ -32,13 +32,14 @@
       </md-dialog-actions>
     </md-dialog>
 
+    <!--suppress RequiredAttributes -->
     <md-dialog-prompt md-title="New Directory" md-input-placeholder="DirectoryName" md-ok-text="Create"
                @close="closeNewDirDialog" v-model="newDir" ref="newDirDialog"/>
   </div>
 </template>
 
 <script>
-  import Config from '../../../config';
+  import Config from '../../../../config';
 
   export default {
     name: 'select-directory-dialog',
@@ -116,8 +117,8 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "variables";
-  @import "general";
+  @import "../variables";
+  @import "../general";
 
   .path {
     width: 100%;
