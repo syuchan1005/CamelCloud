@@ -16,9 +16,11 @@
       </div>
     </div>
 
-    <vue-perfect-scrollbar v-if="files.length" class="files" @contextmenu.native.prevent="click($event)">
-      <file @click="fileClick(file)" v-for="(file, index) in files" :key="index"
-            :name="file.name" :type="file.type" @move="moveFile(file)" @rename="renameFile(file)" @remove="removeFile(file)"/>
+    <vue-perfect-scrollbar v-if="files.length" class="files-wrapper" @contextmenu.native.prevent="click($event)">
+      <div class="files">
+        <file @click="fileClick(file)" v-for="(file, index) in files" :key="index"
+              :name="file.name" :type="file.type" @move="moveFile(file)" @rename="renameFile(file)" @remove="removeFile(file)"/>
+      </div>
     </vue-perfect-scrollbar>
 
     <md-menu md-size="4" ref="menu" :style="menu">
@@ -59,8 +61,8 @@
       SelectDirectoryDialog,
       PathBar,
     },
-    name: 'camera-roll',
-    title: 'CameraRoll',
+    name: 'explorer',
+    title: 'Explorer',
     data() {
       return {
         path: [],
@@ -235,14 +237,17 @@
     margin-top: 10px;
   }
 
-  .files {
+  .files-wrapper {
     width: 100%;
     height: calc(100% - 48px);
-    display: flex;
-    flex-wrap: wrap;
 
-    .file {
-      margin: 10px;
+    .files {
+      display: flex;
+      flex-wrap: wrap;
+
+      .file {
+        margin: 10px;
+      }
     }
   }
 

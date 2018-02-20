@@ -42,20 +42,20 @@ class AxiosMock {
           query.getFiles.fileType = query.getFiles.fileType || 'ALL';
           const getFiles = [];
           if (query.getFiles.fileType === 'ALL') {
-            for (let i = 0; i < 5; i += 1) {
+            for (let i = 0; i < 10; i += 1) {
               getFiles.push({
                 name: `DIRECTORY_${i}`,
                 type: 'DIRECTORY',
               });
             }
-            for (let i = 0; i < 5; i += 1) {
+            for (let i = 0; i < 10; i += 1) {
               getFiles.push({
                 name: `FILE_${i}`,
                 type: 'FILE',
               });
             }
           } else {
-            for (let i = 0; i < 5; i += 1) {
+            for (let i = 0; i < 10; i += 1) {
               getFiles.push({
                 name: `${query.getFiles.fileType}_${i}`,
                 type: query.getFiles.fileType,

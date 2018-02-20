@@ -4,7 +4,7 @@ import store from '@/store';
 import Hello from '@/components/Hello';
 import Check from '@/components/Check';
 import Error from '@/components/Error';
-import CameraRoll from '@/components/CameraRoll';
+import CameraRoll from '@/components/Explorer';
 import Setting from '@/components/Setting';
 
 Vue.use(Router);
