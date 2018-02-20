@@ -5,12 +5,18 @@
 
       <md-dialog-content>
         <div class="path">
-          <md-button :disabled="path === '> '" @click="backPath"><md-icon>arrow_back</md-icon></md-button>
+          <md-button :disabled="!path.length" @click="backPath"><md-icon>arrow_back</md-icon></md-button>
           <md-button @click="openNewDir"><md-icon>create_new_folder</md-icon></md-button>
-          <div class="value">{{ path }}</div>
+          <div class="value">
+            <md-button class="sep">{{ Config.separator }}</md-button>
+            <div v-for="(p, i) in path" :key="i">
+              <div>{{ p }}</div>
+              <md-button class="sep">{{ Config.separator }}</md-button>
+            </div>
+          </div>
         </div>
         <md-list>
-          <md-list-item v-if="dirList.length" v-for="(dir, index) in dirList" :key="index" @click="path += `${dir.name} > `">
+          <md-list-item v-if="dirList.length" v-for="(dir, index) in dirList" :key="index" @click="path.push(dir.name)">
             {{ dir.name }}
           </md-list-item>
           <md-list-item v-if="!dirList.length" @click="openNewDir">
@@ -32,6 +38,8 @@
 </template>
 
 <script>
+  import Config from '../../../config';
+
   export default {
     name: 'select-directory-dialog',
     model: {
@@ -40,14 +48,15 @@
     },
     props: {
       path: {
-        type: String,
-        default: '> ',
+        type: Array,
+        default: () => [],
       },
     },
     data() {
       return {
         dirList: [],
         newDir: '',
+        Config,
       };
     },
     watch: {
@@ -71,7 +80,7 @@
           method: 'post',
           url: '/api',
           data: {
-            query: `query{getFiles(path:"${this.path.replace(/[ ]?> /g, '/')}" fileType:DIRECTORY){name}}`,
+            query: `query{getFiles(path:"${this.path.join('/')}" fileType:DIRECTORY){name}}`,
           },
         }).then((response) => {
           this.dirList = response.data.data.getFiles;
@@ -85,7 +94,7 @@
         if (state !== 'ok') return;
         const input = {
           op: 'MKDIR',
-          path: this.path.replace(/[ ]?> /g, '/'),
+          path: this.path.join('/'),
           source: this.newDir,
         };
         this.$http({
@@ -100,8 +109,7 @@
         });
       },
       backPath() {
-        const path = this.path;
-        if (path !== '> ') this.path = path.substring(0, path.length - path.match('> (?=(.* > ){1})(?!(.* > ){2})')[1].length);
+        this.path.pop();
       },
     },
   };
@@ -137,6 +145,18 @@
       border: solid 1px lightgray;
       @include textEllipsis;
       @include disableSelect;
+
+      display: flex;
+      justify-content: flex-start;
+
+      div.sep {
+        width: 38px;
+      }
+
+      .md-icon.sep {
+        width: 38px;
+        margin-right: auto;
+      }
     }
   }
 

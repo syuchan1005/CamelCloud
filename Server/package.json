@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "nodemon --watch src --exec cross-env NODE_ENV=development babel-node --inspect src/index.js",
+    "dev": "nodemon --watch src --exec cross-env NODE_ENV=development babel-node src/index.js",
     "lint": "eslint --ext .js,.mjs src"
   },
   "dependencies": {

@@ -1,10 +1,18 @@
 <template>
   <div class="select-mode" @dragover.prevent="drag = true">
-    <div v-if="path !== '> ' || files.length" class="path">
-      <md-button :disabled="path === '> '" @click="backPath"><md-icon>arrow_back</md-icon></md-button>
+    <div v-if="path.length || files.length" class="path">
+      <md-button :disabled="!path.length" @click="backPath"><md-icon>arrow_back</md-icon></md-button>
       <md-button @click="uploadFile"><md-icon>file_upload</md-icon></md-button>
       <md-button @click="openNewDir"><md-icon>create_new_folder</md-icon></md-button>
-      <div class="value">{{ path }}</div>
+      <div class="value">
+        <md-icon v-if="Config.separator.icon" class="sep">{{ Config.separator.value }}</md-icon>
+        <div v-else class="sep">{{ Config.separator.value }}</div>
+        <div v-for="(p, i) in path" :key="i">
+          <div class="path-string">{{ p }}</div>
+          <md-icon v-if="Config.separator.icon" class="sep">{{ Config.separator.value }}</md-icon>
+          <div v-else class="sep">{{ Config.separator.value }}</div>
+        </div>
+      </div>
     </div>
 
     <div class="empty-wrapper" v-if="!files.length" >
@@ -39,7 +47,7 @@
     <md-dialog-prompt :md-title="dialog.title" :md-input-placeholder="dialog.placeholder"
                       :md-ok-text="dialog.okText" @close="closeDialog" v-model="dialog.value" ref="dialog"/>
 
-    <select-directory-dialog v-model="dialog.value" ref="selDirDialog" @close="closeDialog"/>
+    <select-directory-dialog v-model="dialog.path" ref="selDirDialog" @close="closeDialog"/>
 
     <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)">
       Drop your picture
@@ -49,6 +57,7 @@
 
 <script>
   import VuePerfectScrollbar from 'vue-perfect-scrollbar';
+  import Config from '../../../config';
   import File from './File';
   import SelectDirectoryDialog from './SelectDirectoryDialog';
 
@@ -58,11 +67,11 @@
       VuePerfectScrollbar,
       SelectDirectoryDialog,
     },
-    name: 'select-mode',
-    title: 'SelectMode',
+    name: 'camera-roll',
+    title: 'CameraRoll',
     data() {
       return {
-        path: '> ',
+        path: [],
         files: [],
         menu: {
           top: '0px',
@@ -74,9 +83,11 @@
           placeholder: '',
           okText: '',
           value: '',
+          path: [],
           file: undefined,
         },
         drag: false,
+        Config,
       };
     },
     mounted() {
@@ -96,7 +107,7 @@
           method: 'post',
           url: '/api',
           data: {
-            query: `query{getFiles(path: "${this.path.replace(/[ ]?> /g, '/')}"){name type}}`,
+            query: `query{getFiles(path: "/${this.path.join('/')}"){name type}}`,
           },
         }).then((response) => {
           this.files = response.data.data.getFiles;
@@ -104,7 +115,7 @@
       },
       fileClick(file) {
         if (file.type === 'DIRECTORY') {
-          this.path += `${file.name} > `;
+          this.path.push(file.name);
         }
       },
       click(event) {
@@ -116,7 +127,7 @@
         if (state !== 'ok') return;
         const input = {
           op: this.dialog.op,
-          path: this.path.replace(/[ ]?> /g, '/'),
+          path: this.path.join('/'),
           source: this.dialog.value,
         };
         if (input.op === 'RENAME') {
@@ -124,7 +135,7 @@
           input.target = this.dialog.value;
         } else if (input.op === 'MOVE') {
           input.source = this.dialog.file;
-          input.target = this.dialog.value.replace(/[ ]?> /g, '/');
+          input.target = this.dialog.path.join('/');
         }
         this.$http({
           method: 'post',
@@ -141,8 +152,9 @@
         this.dialog = {
           op: 'MOVE',
           okText: 'Move',
-          value: this.path,
+          path: this.path.concat(),
           file: file.name,
+          value: '',
         };
         this.$refs.selDirDialog.open();
       },
@@ -178,7 +190,7 @@
       dropFile(event) {
         this.drag = false;
         const formData = new FormData();
-        formData.append('path', this.path.replace(/[ ]?> /g, '/'));
+        formData.append('path', this.path.join('/'));
         const files = event.dataTransfer.files;
         for (let i = 0; i < files.length; i += 1) {
           formData.append('files', files[i]);
@@ -202,8 +214,7 @@
         element.click();
       },
       backPath() {
-        const path = this.path;
-        if (path !== '> ') this.path = path.substring(0, path.length - path.match('> (?=(.* > ){1})(?!(.* > ){2})')[1].length);
+        this.path.pop();
       },
     },
   };
@@ -251,10 +262,55 @@
     .value {
       width: 100%;
       height: 22px;
-      padding-left: 5px;
       border: solid 1px lightgray;
       @include textEllipsis;
       @include disableSelect;
+
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+
+      & > div {
+        display: flex;
+        align-items: center;
+        line-height: normal;
+      }
+
+      .sep {
+        height: 22px;
+        padding: auto 5px;
+
+        &.md-icon {
+          transform: scale(0.6);
+          padding: 0;
+          margin: 0;
+          line-height: normal;
+
+          &:hover {
+            padding: 0;
+          }
+        }
+
+        &:hover:first-child {
+          border-left: none;
+        }
+
+        &:hover {
+          padding: 0 4px;
+          border-left: 1px solid lightgray;
+          border-right: 1px solid lightgray;
+        }
+      }
+
+      .path-string {
+        padding: 0 3px;
+      }
+
+      .path-string:hover {
+        padding: 0 2px;
+        border-left: 1px solid lightgray;
+        border-right: 1px solid lightgray;
+      }
     }
   }
 

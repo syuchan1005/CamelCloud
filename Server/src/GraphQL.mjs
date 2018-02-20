@@ -90,7 +90,7 @@ class GraphQL {
       },
       getFiles: async ({ path, fileType }, ctx) => {
         const user = await this.db.getUser(ctx.state.user.userId);
-        const savePath = `${Config.storage}/${user.dirName}/${path}`;
+        const savePath = `../${Config.storage}/${user.dirName}/${path}`;
         const files = await fs.readdir(savePath).catch(() => undefined);
         if (files) {
           const map = files.map(value => ({
@@ -106,21 +106,21 @@ class GraphQL {
           const user = await this.db.getUser(ctx.state.user.userId);
           switch (data.op) {
             case 'MKDIR':
-              await fs.ensureDir(`${Config.storage}/${user.dirName}/${data.path}/${data.source}`);
+              await fs.ensureDir(`../${Config.storage}/${user.dirName}/${data.path}/${data.source}`);
               break;
             case 'RENAME':
               await fs.rename(
-                `${Config.storage}/${user.dirName}/${data.path}/${data.source}`,
-                `${Config.storage}/${user.dirName}/${data.path}/${data.target}`,
+                `../${Config.storage}/${user.dirName}/${data.path}/${data.source}`,
+                `../${Config.storage}/${user.dirName}/${data.path}/${data.target}`,
               );
               break;
             case 'REMOVE':
-              await fs.remove(`${Config.storage}/${user.dirName}/${data.path}/${data.source}`);
+              await fs.remove(`../${Config.storage}/${user.dirName}/${data.path}/${data.source}`);
               break;
             case 'MOVE':
               await fs.move(
-                `${Config.storage}/${user.dirName}/${data.path}/${data.source}`,
-                `${Config.storage}/${user.dirName}/${data.target}/${data.source}`,
+                `../${Config.storage}/${user.dirName}/${data.path}/${data.source}`,
+                `../${Config.storage}/${user.dirName}/${data.target}/${data.source}`,
               );
               break;
             default:
