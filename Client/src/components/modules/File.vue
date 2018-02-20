@@ -8,15 +8,15 @@
       <!--suppress HtmlUnknownAttribute -->
       <div md-menu-trigger></div>
       <md-menu-content>
-        <md-menu-item @selected="$emit('move', $event)">
+        <md-menu-item @click="$emit('move', $event)">
           <md-icon>open_with</md-icon>
           <span>Move</span>
         </md-menu-item>
-        <md-menu-item @selected="$emit('rename', $event)">
+        <md-menu-item @click="$emit('rename', $event)">
           <md-icon>create</md-icon>
           <span>Rename</span>
         </md-menu-item>
-        <md-menu-item @selected="$emit('remove', $event)">
+        <md-menu-item @click="$emit('remove', $event)">
           <md-icon>delete</md-icon>
           <span>Remove</span>
         </md-menu-item>

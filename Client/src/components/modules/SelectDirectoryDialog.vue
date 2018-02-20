@@ -4,17 +4,9 @@
       <md-dialog-title>Select Directory</md-dialog-title>
 
       <md-dialog-content>
-        <div class="path">
-          <md-button :disabled="!path.length" @click="backPath"><md-icon>arrow_back</md-icon></md-button>
-          <md-button @click="openNewDir"><md-icon>create_new_folder</md-icon></md-button>
-          <div class="value">
-            <md-button class="sep">{{ Config.separator }}</md-button>
-            <div v-for="(p, i) in path" :key="i">
-              <div>{{ p }}</div>
-              <md-button class="sep">{{ Config.separator }}</md-button>
-            </div>
-          </div>
-        </div>
+        <path-bar :path="path" :uploadFile="false"
+                  :icon="Config.separator.icon" :separator="Config.separator.value"
+                  @clickBack="backPath" @clickNewFolder="openNewDir" @clickPath="movePath" />
         <md-list>
           <md-list-item v-if="dirList.length" v-for="(dir, index) in dirList" :key="index" @click="path.push(dir.name)">
             {{ dir.name }}
@@ -40,8 +32,12 @@
 
 <script>
   import Config from '../../../../config';
+  import PathBar from './PathBar';
 
   export default {
+    components: {
+      PathBar,
+    },
     name: 'select-directory-dialog',
     model: {
       prop: 'path',
@@ -55,6 +51,7 @@
     },
     data() {
       return {
+        opened: false,
         dirList: [],
         newDir: '',
         Config,
@@ -62,17 +59,19 @@
     },
     watch: {
       path() {
-        this.$emit('change', this.path);
-        this.getDirectories();
+        if (this.opened) {
+          this.getDirectories();
+        }
       },
     },
     methods: {
       open() {
+        this.opened = true;
         this.dirList = [];
-        this.getDirectories();
         this.$refs.dialog.open();
       },
       close(state) {
+        this.opened = false;
         this.$refs.dialog.close();
         this.$emit('close', state ? 'ok' : 'cancel');
       },
@@ -110,7 +109,10 @@
         });
       },
       backPath() {
-        this.path.pop();
+        this.$emit('change', this.path.slice(0, this.path.length - 1));
+      },
+      movePath(index) {
+        this.$emit('change', this.path.slice(0, index + 1));
       },
     },
   };
@@ -124,6 +126,7 @@
     width: 100%;
     height: 48px;
     padding: 0 5px;
+    margin-bottom: 5px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -162,6 +165,6 @@
   }
 
   .md-list {
-    border: 1px solid black;
+    border: 1px solid rgba(169, 169, 169, 0.6);
   }
 </style>

@@ -1,19 +1,8 @@
 <template>
   <div class="select-mode" @dragover.prevent="drag = true">
-    <div v-if="path.length || files.length" class="path">
-      <md-button :disabled="!path.length" @click="backPath"><md-icon>arrow_back</md-icon></md-button>
-      <md-button @click="uploadFile"><md-icon>file_upload</md-icon></md-button>
-      <md-button @click="openNewDir"><md-icon>create_new_folder</md-icon></md-button>
-      <div class="value">
-        <md-icon v-if="Config.separator.icon" class="sep">{{ Config.separator.value }}</md-icon>
-        <div v-else class="sep">{{ Config.separator.value }}</div>
-        <div v-for="(p, i) in path" :key="i">
-          <div class="path-string">{{ p }}</div>
-          <md-icon v-if="Config.separator.icon" class="sep">{{ Config.separator.value }}</md-icon>
-          <div v-else class="sep">{{ Config.separator.value }}</div>
-        </div>
-      </div>
-    </div>
+    <path-bar :path="path" :icon="Config.separator.icon" :separator="Config.separator.value"
+      @clickBack="backPath" @clickUploadFile="uploadFile" @clickNewFolder="openNewDir"
+      @clickPath="movePath" />
 
     <div class="empty-wrapper" v-if="!files.length" >
       <div class="empty" @click="uploadFile">
@@ -37,7 +26,7 @@
       <div md-menu-trigger></div>
 
       <md-menu-content>
-        <md-menu-item @selected="openNewDir">
+        <md-menu-item @click="openNewDir">
           <md-icon>add</md-icon>
           <span>Create New Folder</span>
         </md-menu-item>
@@ -61,12 +50,14 @@
   import Config from '../../../config';
   import File from './modules/File';
   import SelectDirectoryDialog from './modules/SelectDirectoryDialog';
+  import PathBar from './modules/PathBar';
 
   export default {
     components: {
       File,
       VuePerfectScrollbar,
       SelectDirectoryDialog,
+      PathBar,
     },
     name: 'camera-roll',
     title: 'CameraRoll',
@@ -217,6 +208,9 @@
       backPath() {
         this.path.pop();
       },
+      movePath(index) {
+        this.path = this.path.slice(0, index + 1);
+      },
     },
   };
 </script>
@@ -239,80 +233,6 @@
 
   .empty > .newDir {
     margin-top: 10px;
-  }
-
-  .path {
-    width: 100%;
-    height: 48px;
-    padding: 0 5px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-
-    .md-button {
-      width: 38px;
-      min-width: 38px;
-      padding: 0;
-      transform: scale(0.8);
-    }
-
-    .md-button:hover {
-      color: $mainColor;
-    }
-
-    .value {
-      width: 100%;
-      height: 22px;
-      border: solid 1px lightgray;
-      @include textEllipsis;
-      @include disableSelect;
-
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-
-      & > div {
-        display: flex;
-        align-items: center;
-        line-height: normal;
-      }
-
-      .sep {
-        height: 22px;
-        padding: auto 5px;
-
-        &.md-icon {
-          transform: scale(0.6);
-          padding: 0;
-          margin: 0;
-          line-height: normal;
-
-          &:hover {
-            padding: 0;
-          }
-        }
-
-        &:hover:first-child {
-          border-left: none;
-        }
-
-        &:hover {
-          padding: 0 4px;
-          border-left: 1px solid lightgray;
-          border-right: 1px solid lightgray;
-        }
-      }
-
-      .path-string {
-        padding: 0 3px;
-      }
-
-      .path-string:hover {
-        padding: 0 2px;
-        border-left: 1px solid lightgray;
-        border-right: 1px solid lightgray;
-      }
-    }
   }
 
   .files {
