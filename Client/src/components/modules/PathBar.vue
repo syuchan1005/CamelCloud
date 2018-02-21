@@ -12,17 +12,27 @@
 
     <vue-perfect-scrollbar :settings="{ suppressScrollY: true }" class="value-wrapper" ref="value-wrapper">
       <div class="value" ref="value">
-        <md-icon v-if="icon" class="sep" @click="$emit('clickSeparator', 0)">{{ separator }}</md-icon>
-        <div v-else class="sep" @click="$emit('clickSeparator', 0)">{{ separator }}</div>
+        <md-icon v-if="icon" class="sep" @click="clickSeparator(0)">{{ separator }}</md-icon>
+        <div v-else class="sep" @click="clickSeparator(0)">{{ separator }}</div>
 
         <div v-for="(p, i) in path" :key="i" class="wrap">
           <div class="path-string" @click="$emit('clickPath', i)">{{ p }}</div>
 
-          <md-icon v-if="icon" class="sep" @click="$emit('clickSeparator', i + 1)">{{ separator }}</md-icon>
-          <div v-else class="sep" @click="$emit('clickSeparator', i + 1)">{{ separator }}</div>
+          <md-icon v-if="icon" class="sep" @click="clickSeparator(i + 1)">{{ separator }}</md-icon>
+          <div v-else class="sep" @click="clickSeparator(i + 1)">{{ separator }}</div>
         </div>
       </div>
     </vue-perfect-scrollbar>
+
+
+    <div class="menu-back" v-if="menuOpen" @click="closeDirList"></div>
+    <div class="md-menu-content md-active menu" :style="menu" v-if="menuOpen">
+      <md-list>
+        <md-list-item v-for="(dir, index) in dirList" :key="index" @click="closeDirList(index)">
+          {{ dir.name }}
+        </md-list-item>
+      </md-list>
+    </div>
   </div>
 </template>
 
@@ -34,6 +44,10 @@
       VuePerfectScrollbar,
     },
     name: 'PathBar',
+    model: {
+      prop: 'path',
+      event: 'change',
+    },
     props: {
       icon: {
         type: Boolean,
@@ -66,7 +80,6 @@
       clickUploadFile,
       clickNewFolder,
       clickPath(index),
-      clickSeparator(index),
     ],
     */
     watch: {
@@ -75,6 +88,39 @@
           const wrapper = this.$refs['value-wrapper'].$el;
           wrapper.scrollLeft = wrapper.scrollWidth;
         }, 50);
+      },
+    },
+    data() {
+      return {
+        dirList: [],
+        menu: {
+          top: '0px',
+          left: '0px',
+        },
+        menuOpen: false,
+      };
+    },
+    methods: {
+      clickSeparator(index) {
+        this.menu.top = `${event.clientY + 10}px`;
+        this.menu.left = `${event.clientX + 10}px`;
+        this.$http({
+          method: 'post',
+          url: '/api',
+          data: {
+            query: `query{getFiles(path:"${this.path.slice(0, index + 1).join('/')}" fileType:DIRECTORY){name}}`,
+          },
+        }).then((response) => {
+          this.dirList = response.data.data.getFiles;
+          this.menuOpen = true;
+        });
+      },
+      closeDirList(index) {
+        this.menuOpen = false;
+        if (typeof index === 'number') {
+          this.$emit('change', this.path.concat(this.dirList[index].name));
+        }
+        this.dirList = [];
       },
     },
   };
@@ -109,6 +155,20 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
+
+    .menu {
+      z-index: 6;
+      position: absolute;
+    }
+
+    .menu-back {
+      z-index: 5;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
 
     .md-button {
       width: 38px;

@@ -44,20 +44,20 @@ class AxiosMock {
           if (query.getFiles.fileType === 'ALL') {
             for (let i = 0; i < 10; i += 1) {
               getFiles.push({
-                name: `DIRECTORY_${i}`,
+                name: `Directory_${i}`,
                 type: 'DIRECTORY',
               });
             }
             for (let i = 0; i < 10; i += 1) {
               getFiles.push({
-                name: `FILE_${i}`,
+                name: `File_${i}`,
                 type: 'FILE',
               });
             }
           } else {
             for (let i = 0; i < 10; i += 1) {
               getFiles.push({
-                name: `${query.getFiles.fileType}_${i}`,
+                name: `${query.getFiles.fileType.substr(0, 1)}${query.getFiles.fileType.substring(1).toLowerCase()}_${i}`,
                 type: query.getFiles.fileType,
               });
             }

@@ -1,6 +1,6 @@
 <template>
   <div class="select-mode" @dragover.prevent="drag = true">
-    <path-bar :path="path" :icon="Config.separator.icon" :separator="Config.separator.value"
+    <path-bar v-model="path" :icon="Config.separator.icon" :separator="Config.separator.value"
       @clickBack="backPath" @clickUploadFile="uploadFile" @clickNewFolder="openNewDir"
       @clickPath="movePath" />
 

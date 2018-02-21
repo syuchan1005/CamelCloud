@@ -4,7 +4,7 @@
       <md-dialog-title>Select Directory</md-dialog-title>
 
       <md-dialog-content>
-        <path-bar :path="path" :uploadFile="false"
+        <path-bar v-model="path" :uploadFile="false"
                   :icon="Config.separator.icon" :separator="Config.separator.value"
                   @clickBack="backPath" @clickNewFolder="openNewDir" @clickPath="movePath" />
         <md-list>
