@@ -4,8 +4,7 @@
       <md-dialog-title>Select Directory</md-dialog-title>
 
       <md-dialog-content class="dialog-content">
-        <path-bar v-model="path" :uploadFile="false"
-                  :icon="Config.separator.icon" :separator="Config.separator.value"
+        <path-bar v-model="path" :icon="Config.separator.icon" :separator="Config.separator.value"
                   @clickBack="backPath" @clickNewFolder="openNewDir" @clickPath="movePath" />
         <vue-perfect-scrollbar class="list">
           <md-list>

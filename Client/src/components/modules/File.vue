@@ -8,17 +8,17 @@
       <!--suppress HtmlUnknownAttribute -->
       <div md-menu-trigger></div>
       <md-menu-content>
-        <md-menu-item @click="$emit('move', $event)">
+        <md-menu-item @click="$emit('move', $event)" v-if="showButton('move')">
           <md-icon>open_with</md-icon>
           <span>Move</span>
         </md-menu-item>
-        <md-menu-item @click="$emit('rename', $event)">
+        <md-menu-item @click="$emit('rename', $event)" v-if="showButton('rename')">
           <md-icon>create</md-icon>
           <span>Rename</span>
         </md-menu-item>
-        <md-menu-item @click="$emit('remove', $event)">
+        <md-menu-item @click="$emit('remove', $event)" v-if="showButton('remove')">
           <md-icon>delete</md-icon>
-          <span>Remove</span>
+          <span>{{ removeText }}</span>
         </md-menu-item>
       </md-menu-content>
     </md-menu>
@@ -35,6 +35,16 @@
       type: {
         type: String,
         default: 'FILE',
+      },
+      removeText: {
+        type: String,
+        default: 'Remove',
+      },
+    },
+    methods: {
+      showButton(event) {
+        // eslint-disable-next-line no-underscore-dangle
+        return this._events[event] && this._events[event].length > 0;
       },
     },
   };

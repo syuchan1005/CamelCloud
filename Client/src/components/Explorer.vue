@@ -18,9 +18,11 @@
 
     <vue-perfect-scrollbar v-if="files.length" class="files-wrapper" @contextmenu.native.prevent="click($event)">
       <div class="files">
-        <file @click="fileClick(file)" v-for="(file, index) in files" :key="index"
-              :name="file.name" :type="file.type" @move="moveFile(file)" @rename="renameFile(file)"
-              @remove="removeFile(file)"/>
+        <file v-if="$store.state.viewFilter === 'all'" v-for="(file, index) in files" :key="index" :name="file.name"
+              :type="file.type" @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
+              @rename="renameFile(file)" />
+        <file v-if="$store.state.viewFilter === 'trash'"  v-for="(file, index) in files" :key="index" :name="file.name"
+              :type="file.type" @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)" remove-text="Delete"/>
       </div>
     </vue-perfect-scrollbar>
 

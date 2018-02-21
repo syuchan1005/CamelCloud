@@ -1,12 +1,12 @@
 <template>
   <div class="path">
-    <md-button v-if="back" :disabled="!path.length" @click="$emit('clickBack')">
+    <md-button v-if="showButton('clickBack')" :disabled="!path.length" @click="$emit('clickBack')">
       <md-icon>arrow_back</md-icon>
     </md-button>
-    <md-button v-if="uploadFile" @click="$emit('clickUploadFile')">
+    <md-button v-if="showButton('clickUploadFile')" @click="$emit('clickUploadFile')">
       <md-icon>file_upload</md-icon>
     </md-button>
-    <md-button v-if="newFolder" @click="$emit('clickNewFolder')">
+    <md-button v-if="showButton('clickNewFolder')" @click="$emit('clickNewFolder')">
       <md-icon>create_new_folder</md-icon>
     </md-button>
 
@@ -61,18 +61,6 @@
         type: Array,
         default: [],
       },
-      back: {
-        type: Boolean,
-        default: true,
-      },
-      uploadFile: {
-        type: Boolean,
-        default: true,
-      },
-      newFolder: {
-        type: Boolean,
-        default: true,
-      },
     },
     /*
     event: [
@@ -101,6 +89,10 @@
       };
     },
     methods: {
+      showButton(event) {
+        // eslint-disable-next-line no-underscore-dangle
+        return this._events[event] && this._events[event].length > 0;
+      },
       clickSeparator(index) {
         this.menu.top = `${event.clientY + 10}px`;
         this.menu.left = `${event.clientX + 10}px`;
