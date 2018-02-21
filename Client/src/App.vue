@@ -68,27 +68,12 @@
         listSide: 'left',
         filters: [
           {
-            label: 'Camera Roll',
+            label: 'Explorer',
             icon: 'photo_library',
             name: 'all',
           },
           {
-            label: 'Photos',
-            icon: 'photo',
-            name: 'photo',
-          },
-          {
-            label: 'Videos',
-            icon: 'video_label',
-            name: 'video',
-          },
-          {
-            label: 'Favorite',
-            icon: 'star',
-            name: 'favorite',
-          },
-          {
-            label: 'Recently Deleted',
+            label: 'Trash',
             icon: 'delete',
             name: 'delete',
           },

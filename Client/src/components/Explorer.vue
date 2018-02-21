@@ -1,10 +1,10 @@
 <template>
   <div class="select-mode" @dragover.prevent="drag = true">
     <path-bar v-model="path" :icon="Config.separator.icon" :separator="Config.separator.value"
-      @clickBack="backPath" @clickUploadFile="uploadFile" @clickNewFolder="openNewDir"
-      @clickPath="movePath" />
+              @clickBack="backPath" @clickUploadFile="uploadFile" @clickNewFolder="openNewDir"
+              @clickPath="movePath"/>
 
-    <div class="empty-wrapper" v-if="!files.length" >
+    <div class="empty-wrapper" v-if="!files.length">
       <div class="empty" @click="uploadFile">
         <md-icon>library_books</md-icon>
         <div class="title">Add your first photo</div>
@@ -19,7 +19,8 @@
     <vue-perfect-scrollbar v-if="files.length" class="files-wrapper" @contextmenu.native.prevent="click($event)">
       <div class="files">
         <file @click="fileClick(file)" v-for="(file, index) in files" :key="index"
-              :name="file.name" :type="file.type" @move="moveFile(file)" @rename="renameFile(file)" @remove="removeFile(file)"/>
+              :name="file.name" :type="file.type" @move="moveFile(file)" @rename="renameFile(file)"
+              @remove="removeFile(file)"/>
       </div>
     </vue-perfect-scrollbar>
 
@@ -211,7 +212,9 @@
         this.path.pop();
       },
       movePath(index) {
-        this.path = this.path.slice(0, index + 1);
+        if (this.path.length !== index + 1) {
+          this.path = this.path.slice(0, index + 1);
+        }
       },
     },
   };
@@ -229,7 +232,7 @@
     height: 100%;
   }
 
-  .empty-wrapper{
+  .empty-wrapper {
     @include emptyWrapper;
   }
 
