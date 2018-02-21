@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import nodePath from 'path';
 import { buildSchema } from 'graphql';
 import graphqlHTTP from 'koa-graphql';
 import Config from '../../config';
@@ -42,6 +43,11 @@ class GraphQL {
         ALL
       }
       
+      enum FolderType {
+        NORMAL
+        TRASH
+      }
+      
       input UpdateUser {
         username: String
         password: String
@@ -62,7 +68,7 @@ class GraphQL {
     
       type Query {
         getUser: User
-        getFiles(path: String = "", fileType: FileTypeFilter = ALL): [File!]!
+        getFiles(path: String = "", fileType: FileTypeFilter = ALL, folderType: FolderType = NORMAL): [File!]!
       }
       
       type Mutation {
@@ -88,9 +94,9 @@ class GraphQL {
         });
         return GraphQL.password(await this.db.updateUser(ctx.state.user.userId, data));
       },
-      getFiles: async ({ path, fileType }, ctx) => {
+      getFiles: async ({ path, fileType, folderType }, ctx) => {
         const user = await this.db.getUser(ctx.state.user.userId);
-        const savePath = `../${Config.storage}/${user.dirName}/${path}`;
+        const savePath = `../${Config.storage}/${user.dirName}${folderType === 'NORMAL' ? '' : '_Trash'}/${path}`;
         const files = await fs.readdir(savePath).catch(() => undefined);
         if (files) {
           const map = files.map(value => ({
@@ -101,7 +107,7 @@ class GraphQL {
         }
         return [];
       },
-      operateFile: async ({ data, fileType }, ctx) => {
+      operateFile: async ({ data, fileType, folderType }, ctx) => {
         try {
           const user = await this.db.getUser(ctx.state.user.userId);
           switch (data.op) {
@@ -114,9 +120,25 @@ class GraphQL {
                 `../${Config.storage}/${user.dirName}/${data.path}/${data.target}`,
               );
               break;
-            case 'REMOVE':
-              await fs.remove(`../${Config.storage}/${user.dirName}/${data.path}/${data.source}`);
+            case 'REMOVE': {
+              const basePath = `../${Config.storage}/${user.dirName}`;
+              const ext = nodePath.extname(data.source);
+              const name = data.source.substring(0, data.source.length - ext.length);
+              let i;
+              try {
+                await fs.access(`${basePath}_Trash/${name}${ext.length === 0 ? '' : `.${ext}`}`);
+                for (i = 2; i < 10; i += 1) {
+                  fs.accessSync(`${basePath}_Trash/${name}(${i})${ext.length === 0 ? '' : `.${ext}`}`);
+                }
+                return Promise.reject(new Error('Failed'));
+              } catch (e) {
+                await fs.move(
+                  `${basePath}/${data.path}/${data.source}`,
+                  `${basePath}_Trash/${name}${i ? `(${i})` : ''}${ext.length === 0 ? '' : `.${ext}`}`,
+                );
+              }
               break;
+            }
             case 'MOVE':
               await fs.move(
                 `../${Config.storage}/${user.dirName}/${data.path}/${data.source}`,
@@ -128,6 +150,7 @@ class GraphQL {
           return this.root.getFiles({
             path: data.path,
             fileType,
+            folderType,
           }, ctx);
         } catch (e) {
           return [];
