@@ -75,7 +75,7 @@
           {
             label: 'Trash',
             icon: 'delete',
-            name: 'delete',
+            name: 'trash',
           },
         ],
         innerWidth: window.innerWidth,

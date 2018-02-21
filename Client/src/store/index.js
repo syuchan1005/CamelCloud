@@ -23,4 +23,7 @@ export default new Vuex.Store({
       state.auth.userId = auth.userId;
     },
   },
+  getters: {
+    getViewFilter: state => state.viewFilter,
+  },
 });

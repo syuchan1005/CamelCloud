@@ -50,6 +50,7 @@
 
 <script>
   import VuePerfectScrollbar from 'vue-perfect-scrollbar';
+  import { mapGetters } from 'vuex';
   import Config from '../../../config';
   import File from './modules/File';
   import SelectDirectoryDialog from './modules/SelectDirectoryDialog';
@@ -85,14 +86,23 @@
         Config,
       };
     },
+    computed: {
+      ...mapGetters({
+        viewFilter: 'getViewFilter',
+      }),
+    },
     mounted() {
       if (!this.under480 && !this.$store.state.viewFilter) {
         this.$store.commit('viewFilter', 'all');
+      } else {
+        this.getFiles();
       }
-      this.getFiles();
     },
     watch: {
       path() {
+        this.getFiles();
+      },
+      viewFilter() {
         this.getFiles();
       },
     },
@@ -102,7 +112,7 @@
           method: 'post',
           url: '/api',
           data: {
-            query: `query{getFiles(path: "/${this.path.join('/')}"){name type}}`,
+            query: `query{getFiles(path:"/${this.path.join('/')}"${this.$store.state.viewFilter === 'trash' ? ' folderType:TRASH' : ''}){name type}}`,
           },
         }).then((response) => {
           this.files = response.data.data.getFiles;
