@@ -23,7 +23,10 @@ enum FileType {
 enum FileOperations {
     MKDIR
     RENAME
+    # REMOVE = Move to Trash
     REMOVE
+    # DELETE = Permanently delete
+    DELETE
     MOVE
 }
 

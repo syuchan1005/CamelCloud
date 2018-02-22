@@ -1,5 +1,6 @@
 module.exports = {
   baseURL: 'http://localhost:3000',
+  graphiql: false,
   databaseURL: 'sqlite:test.db',
   storage: 'Storage',
   separator: {
