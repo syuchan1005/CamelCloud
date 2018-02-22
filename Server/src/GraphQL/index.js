@@ -2,81 +2,12 @@ import fs from 'fs-extra';
 import nodePath from 'path';
 import { buildSchema } from 'graphql';
 import graphqlHTTP from 'koa-graphql';
-import Config from '../../config';
+import Config from '../../../config';
 
 class GraphQL {
   constructor(dbManager) {
     this.db = dbManager;
-    this.schema = buildSchema(`
-      type User {
-        userId: Int
-        username: String
-        password: String
-        dirName: String
-        twitterId: String
-        facebookId: String
-        instagramId: String
-        createdAt: String
-        updatedAt: String
-      }
-      
-      type File {
-        name: String
-        type: FileType
-      }
-      
-      enum FileType {
-        FILE
-        DIRECTORY
-      }
-      
-      enum FileOperations {
-        MKDIR
-        RENAME
-        REMOVE
-        MOVE
-      }
-      
-      enum FileTypeFilter {
-        FILE
-        DIRECTORY
-        ALL
-      }
-      
-      enum FolderType {
-        NORMAL
-        TRASH
-      }
-      
-      input UpdateUser {
-        username: String
-        password: String
-      }
-      
-      input clearAuth {
-        twitterId: Boolean
-        facebookId: Boolean
-        instagramId: Boolean
-      }
-      
-      input opFile {
-        op: FileOperations!
-        path: String!
-        source: String!
-        target: String
-      }
-    
-      type Query {
-        getUser: User
-        getFiles(path: String = "", fileType: FileTypeFilter = ALL, folderType: FolderType = NORMAL): [File!]!
-      }
-      
-      type Mutation {
-        setUser(data: UpdateUser): User
-        clearUserAuth(data: clearAuth): User
-        operateFile(data: opFile, fileType: FileTypeFilter = ALL): [File!]!
-      }
-    `);
+    this.schema = buildSchema(fs.readFileSync('schema.graphql', 'utf8'));
     // noinspection JSUnusedGlobalSymbols
     this.root = {
       getUser: async (args, ctx) => {
@@ -84,11 +15,11 @@ class GraphQL {
           .catch(() => /* ignored */ undefined);
         return GraphQL.password(user);
       },
-      setUser: async (args, ctx) =>
-        GraphQL.password(await this.db.updateUser(ctx.state.user.userId, args.data)),
-      clearUserAuth: async (args, ctx) => {
+      setUser: async (args, ctx) => {
         const data = args.data;
-        Object.keys(data).forEach((key) => {
+        if (!data.username) delete data.username;
+        if (!data.password) delete data.password;
+        ['twitterId', 'facebookId', 'InstagramId'].forEach((key) => {
           if (data[key] === true) data[key] = null;
           else delete data[key];
         });
@@ -99,15 +30,18 @@ class GraphQL {
         const savePath = `../${Config.storage}/${user.dirName}${folderType === 'NORMAL' ? '' : '_Trash'}/${path}`;
         const files = await fs.readdir(savePath).catch(() => undefined);
         if (files) {
-          const map = files.map(value => ({
-            name: value,
-            type: fs.statSync(`${savePath}/${value}`).isDirectory() ? 'DIRECTORY' : 'FILE',
-          }));
-          return fileType === 'ALL' ? map : map.filter(value => value.type === fileType);
+          const map = files.map((value) => {
+            const stat = fs.statSync(`${savePath}/${value}`);
+            return {
+              name: value,
+              type: stat.isDirectory() ? 'DIRECTORY' : 'FILE',
+            };
+          });
+          return fileType === null ? map : map.filter(value => value.type === fileType);
         }
         return [];
       },
-      operateFile: async ({ data, fileType, folderType }, ctx) => {
+      operateFile: async ({ data, fileType }, ctx) => {
         try {
           const user = await this.db.getUser(ctx.state.user.userId);
           switch (data.op) {
@@ -131,12 +65,11 @@ class GraphQL {
                   fs.accessSync(`${basePath}_Trash/${name}(${i})${ext.length === 0 ? '' : `.${ext}`}`);
                 }
                 return Promise.reject(new Error('Failed'));
-              } catch (e) {
-                await fs.move(
-                  `${basePath}/${data.path}/${data.source}`,
-                  `${basePath}_Trash/${name}${i ? `(${i})` : ''}${ext.length === 0 ? '' : `.${ext}`}`,
-                );
-              }
+              } catch (ignored) { /* File Not Found */ }
+              await fs.move(
+                `${basePath}/${data.path}/${data.source}`,
+                `${basePath}_Trash/${name}${i ? `(${i})` : ''}${ext.length === 0 ? '' : `.${ext}`}`,
+              );
               break;
             }
             case 'MOVE':
@@ -150,7 +83,7 @@ class GraphQL {
           return this.root.getFiles({
             path: data.path,
             fileType,
-            folderType,
+            folderType: 'NORMAL',
           }, ctx);
         } catch (e) {
           return [];

@@ -1,0 +1,58 @@
+type User {
+    userId: Int
+    username: String
+    password: String
+    dirName: String
+    twitterId: String
+    facebookId: String
+    instagramId: String
+    createdAt: String
+    updatedAt: String
+}
+
+type File {
+    name: String
+    type: FileType
+}
+
+enum FileType {
+    FILE
+    DIRECTORY
+}
+
+enum FileOperations {
+    MKDIR
+    RENAME
+    REMOVE
+    MOVE
+}
+
+enum FolderType {
+    NORMAL
+    TRASH
+}
+
+input UpdateUser {
+    username: String
+    password: String
+    twitterId: Boolean = false
+    facebookId: Boolean = false
+    instagramId: Boolean = false
+}
+
+input OperateFile {
+    op: FileOperations!
+    path: String!
+    source: String!
+    target: String
+}
+
+type Query {
+    getUser: User
+    getFiles(path: String = "", fileType: FileType, folderType: FolderType = NORMAL): [File!]!
+}
+
+type Mutation {
+    setUser(data: UpdateUser): User
+    operateFile(data: OperateFile, fileType: FileType): [File!]!
+}
