@@ -10,10 +10,6 @@
         <label>Username</label>
         <md-input disabled v-model="user.username"/>
       </md-input-container>
-      <md-button class="md-raised">
-        <md-icon>build</md-icon>
-        Change
-      </md-button>
     </div>
 
     <div class="holder password">
@@ -21,7 +17,7 @@
         <label>Password</label>
         <md-input disabled v-model='user.password'/>
       </md-input-container>
-      <md-button class="md-raised">
+      <md-button class="md-raised" @click="openChangeDialog">
         <md-icon>build</md-icon>
         Change
       </md-button>
@@ -32,7 +28,7 @@
         <label>TwitterID</label>
         <md-input disabled v-model="user.twitterId"/>
       </md-input-container>
-      <md-button class="md-raised" @click="authRequest('twitter')">
+      <md-button class="md-raised" @click="clickAuth('twitter')">
         <div class="stack-icon" v-if="user.twitterId">
           <md-icon>link</md-icon>
           <md-icon>clear</md-icon>
@@ -47,7 +43,7 @@
         <label>FacebookID</label>
         <md-input disabled v-model="user.facebookId"/>
       </md-input-container>
-      <md-button class="md-raised" @click="authRequest('facebook')">
+      <md-button class="md-raised" @click="clickAuth('facebook')">
         <div class="stack-icon" v-if="user.facebookId">
           <md-icon>link</md-icon>
           <md-icon>clear</md-icon>
@@ -62,7 +58,7 @@
         <label>InstagramID</label>
         <md-input disabled v-model="user.instagramId"/>
       </md-input-container>
-      <md-button class="md-raised" @click="authRequest('instagram')">
+      <md-button class="md-raised" @click="clickAuth('instagram')">
         <div class="stack-icon" v-if="user.instagramId">
           <md-icon>link</md-icon>
           <md-icon>clear</md-icon>
@@ -71,6 +67,26 @@
         {{ user.instagramId ? 'unLink' : 'Link' }}
       </md-button>
     </div>
+
+    <md-dialog ref="changeDialog">
+      <md-dialog-title>Change Password</md-dialog-title>
+
+      <md-dialog-content>
+        <md-input-container>
+          <label>Old Password</label>
+          <md-input type="password" v-model="dialog.oldPassword"/>
+        </md-input-container>
+        <md-input-container>
+          <label>New Password</label>
+          <md-input type="password" v-model="dialog.newPassword"/>
+        </md-input-container>
+      </md-dialog-content>
+
+      <md-dialog-actions>
+        <md-button class="md-primary" @click="closeChangeDialog('cancel')">Cancel</md-button>
+        <md-button class="md-primary" @click="closeChangeDialog('ok')">Change</md-button>
+      </md-dialog-actions>
+    </md-dialog>
   </div>
 </template>
 
@@ -80,6 +96,10 @@
     data() {
       return {
         user: {},
+        dialog: {
+          oldPassword: '',
+          newPassword: '',
+        },
       };
     },
     mounted() {
@@ -94,18 +114,23 @@
       });
     },
     methods: {
-      authRequest(service) {
+      openChangeDialog() {
+        this.$refs.changeDialog.open();
+      },
+      closeChangeDialog(state) {
+        this.$refs.changeDialog.close();
+        if (state !== 'ok') return;
+        if (this.dialog.oldPassword && this.dialog.newPassword) {
+          this.updateUser({
+            oldPassword: this.dialog.oldPassword,
+            newPassword: this.dialog.newPassword,
+          });
+        }
+      },
+      clickAuth(service) {
         if (this.user[`${service}Id`]) {
-          this.$http({
-            method: 'post',
-            url: '/api',
-            data: {
-              query: 'mutation ClearUserAuth($input: clearAuth){clearUserAuth(data:$input)' +
-              '{username password twitterId facebookId instagramId}}',
-              variables: { input: { [`${service}Id`]: true } },
-            },
-          }).then((response) => {
-            this.user = response.data.data.clearUserAuth;
+          this.updateUser({
+            [`${service}Id`]: true,
           });
         } else if (window.location.protocol === 'http:' || service === 'instagram') {
           window.location.href = `/api/auth/${service}`;
@@ -114,6 +139,19 @@
             this.$snotify.error('', `${error.response.status}`);
           });
         }
+      },
+      updateUser(input) {
+        this.$http({
+          method: 'post',
+          url: '/api',
+          data: {
+            query: 'mutation SetUser($input: UpdateUser){setUser(data:$input)' +
+            '{username password twitterId facebookId instagramId}}',
+            variables: { input },
+          },
+        }).then((response) => {
+          this.user = response.data.data.setUser;
+        });
       },
     },
   };

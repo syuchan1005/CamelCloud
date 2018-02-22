@@ -73,8 +73,7 @@ class DBManager {
     });
     const data = userData;
     if (data.password) {
-      data.hash = DBManager.sha256(DBManager.sha256(userData.username || user.username)
-        + user.createdAt);
+      data.hash = DBManager.passwordStretch(user.username, user.createdAt);
       delete data.password;
     }
     user = await user.update(data);

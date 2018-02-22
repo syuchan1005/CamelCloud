@@ -17,7 +17,7 @@ class AxiosMock {
     });
     this.mock.onPost('/api').reply((config) => {
       let str = JSON.parse(config.data).query;
-      const map = ['DIRECTORY', 'FILE', 'ALL', 'NORMAL', 'TRASH'];
+      const map = ['DIRECTORY', 'FILE', 'TRASH'];
       map.forEach((v) => {
         str = str.replace(v, `'${v}'`);
       });
@@ -39,19 +39,17 @@ class AxiosMock {
           query.getUser.requireArgs.forEach((k) => { getUser[k] = data[k]; });
           return [200, { data: { getUser } }];
         } else if (query.getFiles) {
-          query.getFiles.fileType = query.getFiles.fileType || 'ALL';
-          query.getFiles.folderType = `${query.getFiles.folderType || 'NORMAL'}_`;
           const getFiles = [];
-          if (query.getFiles.fileType === 'ALL') {
+          if (!query.getFiles.fileType) {
             for (let i = 0; i < 10; i += 1) {
               getFiles.push({
-                name: `${query.getFiles.folderType}Directory_${i}`,
+                name: `${query.getFiles.folderType || ''}Directory_${i}`,
                 type: 'DIRECTORY',
               });
             }
             for (let i = 0; i < 10; i += 1) {
               getFiles.push({
-                name: `${query.getFiles.folderType}File_${i}`,
+                name: `${query.getFiles.folderType || ''}File_${i}`,
                 type: 'FILE',
               });
             }

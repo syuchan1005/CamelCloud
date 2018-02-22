@@ -35,8 +35,8 @@ enum FolderType {
 }
 
 input UpdateUser {
-    username: String
-    password: String
+    oldPassword: String
+    newPassword: String
     twitterId: Boolean = false
     facebookId: Boolean = false
     instagramId: Boolean = false

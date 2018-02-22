@@ -3,6 +3,7 @@ import nodePath from 'path';
 import { buildSchema } from 'graphql';
 import graphqlHTTP from 'koa-graphql';
 import Config from '../../../config';
+import DBManager from '../DBManager.mjs';
 
 class GraphQL {
   constructor(dbManager) {
@@ -20,9 +21,18 @@ class GraphQL {
   // noinspection JSUnusedGlobalSymbols
   async setUser(args, ctx) {
     const data = args.data;
-    if (!data.username) delete data.username;
-    if (!data.password) delete data.password;
-    ['twitterId', 'facebookId', 'InstagramId'].forEach((key) => {
+    if (data.oldPassword) {
+      const user = await this.db.getUser({
+        userId: ctx.state.user.userId,
+      });
+      const oldHash = DBManager.passwordStretch(data.oldPassword, user.createdAt);
+      if (user.hash === oldHash) {
+        data.password = data.newPassword;
+        delete data.oldPassword;
+        delete data.newPassword;
+      }
+    }
+    ['twitterId', 'facebookId', 'instagramId'].forEach((key) => {
       if (data[key] === true) data[key] = null;
       else delete data[key];
     });

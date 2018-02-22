@@ -111,7 +111,7 @@
           this.$snotify.error('Invalid ID or Password.', 'Login Failed');
         }
       },
-      authRequest(service) {
+      clickAuth(service) {
         if (window.location.protocol === 'http:' || service === 'instagram') {
           window.location.href = `/api/auth/${service}`;
         } else {
