@@ -106,6 +106,7 @@
       },
       viewFilter() {
         this.getFiles();
+        this.path = [];
       },
     },
     methods: {
