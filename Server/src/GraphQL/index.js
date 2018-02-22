@@ -27,7 +27,7 @@ class GraphQL {
       },
       getFiles: async ({ path, fileType, folderType }, ctx) => {
         const user = await this.db.getUser(ctx.state.user.userId);
-        const savePath = `../${Config.storage}/${user.dirName}${folderType === 'NORMAL' ? '' : '_Trash'}/${path}`;
+        const savePath = `../${Config.storage}/${user.dirName}${folderType === 'TRASH' ? '_Trash' : ''}/${path}`;
         const files = await fs.readdir(savePath).catch(() => undefined);
         if (files) {
           const map = files.map((value) => {

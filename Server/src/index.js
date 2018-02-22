@@ -10,7 +10,7 @@ import koaPassport from 'koa-passport';
 import multer from 'koa-multer';
 import historyApiFallback from 'koa2-connect-history-api-fallback';
 import Passport from './Passport.mjs';
-import GraphQL from './GraphQL.mjs';
+import GraphQL from './GraphQL';
 import Config from './../../config';
 import ServerConfig from '../config';
 import DBManager from './DBManager.mjs';

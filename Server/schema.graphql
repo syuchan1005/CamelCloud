@@ -28,7 +28,6 @@ enum FileOperations {
 }
 
 enum FolderType {
-    NORMAL
     TRASH
 }
 
@@ -49,7 +48,7 @@ input OperateFile {
 
 type Query {
     getUser: User
-    getFiles(path: String = "", fileType: FileType, folderType: FolderType = NORMAL): [File!]!
+    getFiles(path: String = "", fileType: FileType, folderType: FolderType): [File!]!
 }
 
 type Mutation {
