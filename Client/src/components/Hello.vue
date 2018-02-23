@@ -1,7 +1,6 @@
 <template>
   <div class="hello">
     <div class="title">CamelCloud</div>
-    <div class="sub-title">= picture + storage</div>
     <div class="form">
       <form>
         <md-input-container>
@@ -141,11 +140,6 @@
 
   .title {
     font-size: 3rem;
-    line-height: normal;
-  }
-
-  .sub-title {
-    font-size: 1.2rem;
     line-height: normal;
   }
 
