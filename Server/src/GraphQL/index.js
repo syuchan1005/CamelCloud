@@ -52,27 +52,27 @@ class GraphQL {
           type: stat.isDirectory() ? 'DIRECTORY' : 'FILE',
         };
       });
-      return fileType === null ? map : map.filter(value => value.type === fileType);
+      return !fileType ? map : map.filter(value => value.type === fileType);
     }
     return [];
   }
 
   // noinspection JSUnusedGlobalSymbols
-  async operateFile({ data, fileType }, ctx) {
+  async operateFile({ data }, ctx) {
     try {
       const user = await this.db.getUser(ctx.state.user.userId);
+      const basePath = `../${Config.storage}/${user.dirName}`;
       switch (data.op) {
         case 'MKDIR':
-          await fs.ensureDir(`../${Config.storage}/${user.dirName}/${data.path}/${data.source}`);
+          await fs.ensureDir(`${basePath}/${data.path}/${data.source}`);
           break;
         case 'RENAME':
           await fs.rename(
-            `../${Config.storage}/${user.dirName}/${data.path}/${data.source}`,
-            `../${Config.storage}/${user.dirName}/${data.path}/${data.target}`,
+            `${basePath}/${data.path}/${data.source}`,
+            `${basePath}/${data.path}/${data.target}`,
           );
           break;
         case 'REMOVE': {
-          const basePath = `../${Config.storage}/${user.dirName}`;
           const ext = nodePath.extname(data.source);
           const name = data.source.substring(0, data.source.length - ext.length);
           let i;
@@ -92,19 +92,18 @@ class GraphQL {
           break;
         }
         case 'DELETE':
-          await fs.remove(`../${Config.storage}/${user.dirName}_Trash/${data.path}/${data.source}`);
+          await fs.remove(`${basePath}_Trash/${data.path}/${data.source}`);
           break;
         case 'MOVE':
           await fs.move(
-            `../${Config.storage}/${user.dirName}/${data.path}/${data.source}`,
-            `../${Config.storage}/${user.dirName}/${data.target}/${data.source}`,
+            `${basePath}/${data.path}/${data.source}`,
+            `${basePath}/${data.target}/${data.source}`,
           );
           break;
         default:
       }
-      return this.root.getFiles({
+      return await this.getFiles({
         path: data.path,
-        fileType,
       }, ctx);
     } catch (e) {
       return Promise.reject(e);
