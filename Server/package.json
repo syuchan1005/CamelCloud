@@ -1,7 +1,7 @@
 {
-  "name": "pic_storage-server",
+  "name": "camel_cloud-server",
   "version": "1.0.0",
-  "description": "PicStorage Backend",
+  "description": "CamelCloud Backend",
   "main": "index.js",
   "author": "syuchan1005 <syuchan.dev@gmail.com>",
   "license": "MIT",

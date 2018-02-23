@@ -1,6 +1,4 @@
-# pic_storage
-
-> It manages pictures of your PC, phone, etc.
+# CamelCloud
 
 ## Build Setup
 

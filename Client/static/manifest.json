@@ -1,6 +1,6 @@
 {
-  "name": "PicStorage",
-  "short_name": "PicStorage",
+  "name": "CamelCloud",
+  "short_name": "CamelCloud",
   "icons": [
     {
       "src": "/static/icon/icon-x192.png",

@@ -100,7 +100,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     ]),
     // service worker caching
     new SWPrecacheWebpackPlugin({
-      cacheId: 'pic_storage',
+      cacheId: 'camel_cloud',
       filename: 'service-worker.js',
       staticFileGlobs: ['dist/**/*.{js,html,css,woff2,woff}'],
       minify: true,

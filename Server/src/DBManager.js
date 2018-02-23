@@ -7,7 +7,7 @@ import { databaseURI } from '../../config';
 
 class DBManager {
   constructor() {
-    this.logging = debug('picstorage-db');
+    this.logging = debug('camelcloud-db');
     this.db = new Sequelize(databaseURI, {
       logging: this.logging,
       operatorsAliases: Sequelize.Op,

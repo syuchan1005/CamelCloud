@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="top" v-if="$route.meta.header">
-      <div class="title">PicStorage</div>
+      <div class="title">CamelCloud</div>
       <router-link tag="md-button" class="md-raised" to="/setting">
         <md-icon>settings</md-icon>
         Setting

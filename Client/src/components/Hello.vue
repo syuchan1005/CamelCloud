@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <div class="title">PicStorage</div>
+    <div class="title">CamelCloud</div>
     <div class="sub-title">= picture + storage</div>
     <div class="form">
       <form>
