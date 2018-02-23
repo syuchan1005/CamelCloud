@@ -2,8 +2,8 @@ import fs from 'fs-extra';
 import nodePath from 'path';
 import { buildSchema } from 'graphql';
 import graphqlHTTP from 'koa-graphql';
-import Config from '../../../config';
-import DBManager from '../DBManager.mjs';
+import Config from '../../config';
+import DBManager from './DBManager';
 
 class GraphQL {
   constructor(dbManager) {

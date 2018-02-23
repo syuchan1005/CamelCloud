@@ -8,6 +8,8 @@
   "private": true,
   "scripts": {
     "dev": "nodemon --watch src --exec cross-env NODE_ENV=development babel-node src/index.js",
+    "start": "node dist/index.js",
+    "build": "babel src -d dist",
     "lint": "eslint --ext .js,.mjs src"
   },
   "dependencies": {
