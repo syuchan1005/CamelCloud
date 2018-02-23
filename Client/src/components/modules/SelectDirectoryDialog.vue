@@ -95,17 +95,11 @@
       },
       closeNewDirDialog(state) {
         if (state !== 'ok') return;
-        const input = {
-          op: 'MKDIR',
-          path: this.path.join('/'),
-          source: this.newDir,
-        };
         this.$http({
           method: 'post',
           url: '/api',
           data: {
-            query: 'mutation OperateFile($input: opFile){operateFile(data:$input fileType:DIRECTORY){name}}',
-            variables: { input },
+            query: `mutation {operateFile(data:{op:MKDIR,path:"${this.path.join('/')}",source:"${this.newDir}"} fileType:DIRECTORY){name}}`,
           },
         }).then((response) => {
           this.dirList = response.data.data.operateFile;

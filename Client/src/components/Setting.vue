@@ -91,6 +91,9 @@
 </template>
 
 <script>
+  import sha256 from 'js-sha256';
+  import config from '../../../config';
+
   export default {
     name: 'setting',
     data() {
@@ -121,9 +124,15 @@
         this.$refs.changeDialog.close();
         if (state !== 'ok') return;
         if (this.dialog.oldPassword && this.dialog.newPassword) {
+          let oldPass = this.dialog.oldPassword;
+          let newPass = this.dialog.newPassword;
+          for (let i = 0; i < config.auth.local.stretch; i += 1) {
+            oldPass = sha256(oldPass);
+            newPass = sha256(newPass);
+          }
           this.updateUser({
-            oldPassword: this.dialog.oldPassword,
-            newPassword: this.dialog.newPassword,
+            oldPassword: oldPass,
+            newPassword: newPass,
           });
         }
       },
@@ -141,13 +150,15 @@
         }
       },
       updateUser(input) {
+        let data = '{';
+        Object.keys(input).forEach((key) => {
+          data += `${key}:"${input[key]}",`;
+        });
         this.$http({
           method: 'post',
           url: '/api',
           data: {
-            query: 'mutation SetUser($input: UpdateUser){setUser(data:$input)' +
-            '{username password twitterId facebookId instagramId}}',
-            variables: { input },
+            query: `mutation{setUser(data:${data}}){username password twitterId facebookId instagramId}}`,
           },
         }).then((response) => {
           this.user = response.data.data.setUser;

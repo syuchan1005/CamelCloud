@@ -105,7 +105,6 @@
         this.getFiles();
       },
       viewFilter() {
-        this.getFiles();
         this.path = [];
       },
     },
@@ -133,24 +132,19 @@
       },
       closeDialog(state) {
         if (state !== 'ok') return;
-        const input = {
-          op: this.dialog.op,
-          path: this.path.join('/'),
-          source: this.dialog.value,
-        };
+        let input = `{op:${this.dialog.op},path:"${this.path.join('/')}"`;
         if (input.op === 'RENAME') {
-          input.source = this.dialog.file;
-          input.target = this.dialog.value;
+          input += `,source:"${this.dialog.file}",target:"${this.dialog.value}"`;
         } else if (input.op === 'MOVE') {
-          input.source = this.dialog.file;
-          input.target = this.dialog.path.join('/');
+          input += `,source:"${this.dialog.file}",target:"${this.dialog.path.join('/')}"`;
+        } else {
+          input += `,source:"${this.dialog.value}"`;
         }
         this.$http({
           method: 'post',
           url: '/api',
           data: {
-            query: 'mutation OperateFile($input: opFile){operateFile(data:$input){type name}}',
-            variables: { input },
+            query: `mutation{operateFile(data:${input}}){type name}}`,
           },
         }).then((response) => {
           this.files = response.data.data.operateFile;

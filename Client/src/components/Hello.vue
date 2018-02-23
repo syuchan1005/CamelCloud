@@ -18,17 +18,17 @@
       <div class="login-label">or sign in with</div>
 
       <div class="auth">
-        <md-button class="md-clean twitter" @click="authRequest('twitter')">
+        <md-button class="md-clean twitter" @click="clickAuth('twitter')">
           <icon name="twitter" scale="2.5"/>
         </md-button>
         <div>Twitter</div>
 
-        <md-button class="md-clean facebook" @click="authRequest('facebook')">
+        <md-button class="md-clean facebook" @click="clickAuth('facebook')">
           <icon name="facebook" scale="2.5"/>
         </md-button>
         <div>Facebook</div>
 
-        <md-button class="md-clean instagram" @click="authRequest('instagram')">
+        <md-button class="md-clean instagram" @click="clickAuth('instagram')">
           <icon name="instagram" scale="3"/>
         </md-button>
         <div>Instagram</div>

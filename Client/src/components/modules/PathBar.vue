@@ -12,14 +12,14 @@
 
     <vue-perfect-scrollbar :settings="{ suppressScrollY: true }" class="value-wrapper" ref="value-wrapper">
       <div class="value" ref="value">
-        <md-icon v-if="icon" class="sep" @click="clickSeparator(0)">{{ separator }}</md-icon>
-        <div v-else class="sep" @click="clickSeparator(0)">{{ separator }}</div>
+        <md-icon v-if="icon" class="sep" @click="clickSeparator(0, $event)">{{ separator }}</md-icon>
+        <div v-else class="sep" @click="clickSeparator(0, $event)">{{ separator }}</div>
 
         <div v-for="(p, i) in path" :key="i" class="wrap">
           <div class="path-string" @click="$emit('clickPath', i)">{{ p }}</div>
 
-          <md-icon v-if="icon" class="sep" @click="clickSeparator(i + 1)">{{ separator }}</md-icon>
-          <div v-else class="sep" @click="clickSeparator(i + 1)">{{ separator }}</div>
+          <md-icon v-if="icon" class="sep" @click="clickSeparator(i + 1, $event)">{{ separator }}</md-icon>
+          <div v-else class="sep" @click="clickSeparator(i + 1, $event)">{{ separator }}</div>
         </div>
       </div>
     </vue-perfect-scrollbar>
@@ -93,7 +93,7 @@
         // eslint-disable-next-line no-underscore-dangle
         return this._events[event] && this._events[event].length > 0;
       },
-      clickSeparator(index) {
+      clickSeparator(index, event) {
         this.menu.top = `${event.clientY + 10}px`;
         this.menu.left = `${event.clientX + 10}px`;
         this.$http({
