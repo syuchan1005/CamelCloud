@@ -100,10 +100,10 @@
           method: 'post',
           url: '/api',
           data: {
-            query: `query{getFiles(path:"${this.path.slice(0, index + 1).join('/')}" fileType:DIRECTORY){name}}`,
+            query: `query{files(path:"${this.path.slice(0, index + 1).join('/')}" fileFilter:DIRECTORY){name}}`,
           },
         }).then((response) => {
-          this.dirList = response.data.data.getFiles;
+          this.dirList = response.data.data.files;
           this.menuOpen = true;
         });
       },

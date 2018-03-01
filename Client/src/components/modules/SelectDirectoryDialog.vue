@@ -83,10 +83,10 @@
           method: 'post',
           url: '/api',
           data: {
-            query: `query{getFiles(path:"${this.path.join('/')}" fileType:DIRECTORY){name}}`,
+            query: `query{files(path:"${this.path.join('/')}" fileFilter:DIRECTORY){name}}`,
           },
         }).then((response) => {
-          this.dirList = response.data.data.getFiles;
+          this.dirList = response.data.data.files;
         });
       },
       openNewDir() {

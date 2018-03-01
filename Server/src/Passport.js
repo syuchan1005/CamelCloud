@@ -88,14 +88,13 @@ class Passport {
   }
 
   twitter() {
-    passport.use(
-      new TwitterStrategy({
-        consumerKey: auth.twitter.consumerKey,
-        consumerSecret: auth.twitter.consumerSecret,
-        callbackURL: `${Config.baseURL}/api/auth/twitter/callback`,
-        passReqToCallback: true,
-      }, (request, accessToken, tokenSecret, profile, done) =>
-        this.userCheck(request, { twitterId: profile.id }, done)));
+    passport.use(new TwitterStrategy({
+      consumerKey: auth.twitter.consumerKey,
+      consumerSecret: auth.twitter.consumerSecret,
+      callbackURL: `${Config.baseURL}/api/auth/twitter/callback`,
+      passReqToCallback: true,
+    }, (request, accessToken, tokenSecret, profile, done) =>
+      this.userCheck(request, { twitterId: profile.id }, done)));
     this.router.get('/twitter', passport.authorize('twitter'));
     this.router.get('/twitter/callback', async (ctx, next) => {
       await passport.authorize('twitter', this.authRouter(ctx))(ctx, next);

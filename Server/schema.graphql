@@ -3,18 +3,17 @@ enum FileType {
     DIRECTORY
 }
 
+enum FolderType {
+    NORMAL
+    TRASH
+}
+
 enum FileOperations {
     MKDIR
     RENAME
-    # REMOVE = Move to Trash
-    REMOVE
-    # DELETE = Permanently delete
-    DELETE
     MOVE
-}
-
-enum FolderType {
-    TRASH
+    REMOVE # Move to Trash
+    DELETE # Permanently delete
 }
 
 type User {
@@ -30,8 +29,8 @@ type User {
 }
 
 type File {
-    name: String
-    type: FileType
+    name: String!
+    type: FileType!
 }
 
 input InputUser {
@@ -42,26 +41,20 @@ input InputUser {
     instagramId: Boolean = false
 }
 
-input InputFile {
-    path: String!
-    name: String
-    fileType: FileType
-    folderType: FolderType
-}
-
 input OperateFile {
     op: FileOperations!
     path: String!
+    sourceFolder: FolderType = NORMAL
     source: String!
     target: String
 }
 
 type Query {
-    getUser: User
-    getFiles(path: String = "", fileType: FileType, folderType: FolderType): [File!]!
+    user: User
+    files(path: String = "", fileFilter: FileType, folderType: FolderType = NORMAL): [File!]!
 }
 
 type Mutation {
-    setUser(data: InputUser): User
+    updateUser(data: InputUser): User
     operateFile(data: OperateFile): [File!]!
 }

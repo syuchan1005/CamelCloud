@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import nodePath from 'path';
+import dateformat from 'dateformat';
 import { buildSchema } from 'graphql';
 import graphqlHTTP from 'koa-graphql';
 import Config from '../../config';
@@ -12,35 +13,35 @@ class GraphQL {
   }
 
   // noinspection JSUnusedGlobalSymbols
-  async getUser(args, ctx) {
+  async user(args, ctx) {
     const user = await this.db.getUser(ctx.state.user.userId)
       .catch(() => /* ignored */ undefined);
     return GraphQL.password(user);
   }
 
   // noinspection JSUnusedGlobalSymbols
-  async setUser(args, ctx) {
-    const data = args.data;
-    if (data.oldPassword) {
+  async updateUser({ data }, ctx) {
+    const input = data;
+    if (input.oldPassword) {
       const user = await this.db.getUser({
         userId: ctx.state.user.userId,
       });
-      const oldHash = DBManager.passwordStretch(data.oldPassword, user.createdAt);
+      const oldHash = DBManager.passwordStretch(input.oldPassword, user.createdAt);
       if (user.hash === oldHash) {
-        data.password = data.newPassword;
-        delete data.oldPassword;
-        delete data.newPassword;
+        input.password = input.newPassword;
+        delete input.oldPassword;
+        delete input.newPassword;
       }
     }
     ['twitterId', 'facebookId', 'instagramId'].forEach((key) => {
-      if (data[key] === true) data[key] = null;
-      else delete data[key];
+      if (input[key] === true) input[key] = null;
+      else delete input[key];
     });
-    return GraphQL.password(await this.db.updateUser(ctx.state.user.userId, data));
+    return GraphQL.password(await this.db.updateUser(ctx.state.user.userId, input));
   }
 
   // noinspection JSUnusedGlobalSymbols
-  async getFiles({ path, fileType, folderType }, ctx) {
+  async files({ path, fileFilter, folderType }, ctx) {
     const user = await this.db.getUser(ctx.state.user.userId);
     const savePath = `../${Config.storage}/${user.dirName}${folderType === 'TRASH' ? '_Trash' : ''}/${path}`;
     const files = await fs.readdir(savePath).catch(() => undefined);
@@ -52,7 +53,7 @@ class GraphQL {
           type: stat.isDirectory() ? 'DIRECTORY' : 'FILE',
         };
       });
-      return !fileType ? map : map.filter(value => value.type === fileType);
+      return !fileFilter ? map : map.filter(value => value.type === fileFilter);
     }
     return [];
   }
@@ -62,6 +63,7 @@ class GraphQL {
     try {
       const user = await this.db.getUser(ctx.state.user.userId);
       const basePath = `../${Config.storage}/${user.dirName}`;
+      let folderType = null;
       switch (data.op) {
         case 'MKDIR':
           await fs.ensureDir(`${basePath}/${data.path}/${data.source}`);
@@ -74,36 +76,41 @@ class GraphQL {
           break;
         case 'REMOVE': {
           const ext = nodePath.extname(data.source);
-          const name = data.source.substring(0, data.source.length - ext.length);
+          let name = data.source.substring(0, data.source.length - ext.length);
           let i;
+          const suffix = ext.length === 0 ? '' : ext;
           try {
-            await fs.access(`${basePath}_Trash/${name}${ext.length === 0 ? '' : `.${ext}`}`);
+            await fs.access(`${basePath}_Trash/${name}${suffix}`);
+            name += ` ${dateformat(Date.now(), 'isoTime')}`;
+            await fs.access(`${basePath}_Trash/${name}${suffix}`);
             for (i = 2; i < 10; i += 1) {
-              fs.accessSync(`${basePath}_Trash/${name}(${i})${ext.length === 0 ? '' : `.${ext}`}`);
+              fs.accessSync(`${basePath}_Trash/${name}(${i})${suffix}`);
             }
             return Promise.reject(new Error('Failed'));
-          } catch (ignored) {
-            /* File Not Found */
+          } catch (err) {
+            await fs.move(
+              `${basePath}/${data.path}/${data.source}`,
+              err.path,
+            );
           }
-          await fs.move(
-            `${basePath}/${data.path}/${data.source}`,
-            `${basePath}_Trash/${name}${i ? `(${i})` : ''}${ext.length === 0 ? '' : `.${ext}`}`,
-          );
           break;
         }
         case 'DELETE':
           await fs.remove(`${basePath}_Trash/${data.path}/${data.source}`);
+          folderType = 'TRASH';
           break;
         case 'MOVE':
           await fs.move(
-            `${basePath}/${data.path}/${data.source}`,
+            `${basePath}${data.sourceFolder === 'TRASH' ? '_Trash' : ''}/${data.path}/${data.source}`,
             `${basePath}/${data.target}/${data.source}`,
           );
+          folderType = data.sourceFolder;
           break;
         default:
       }
-      return await this.getFiles({
+      return await this.files({
         path: data.path,
+        folderType,
       }, ctx);
     } catch (e) {
       return Promise.reject(e);

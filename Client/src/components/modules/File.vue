@@ -9,15 +9,15 @@
       <div md-menu-trigger></div>
       <md-menu-content>
         <md-menu-item @click="$emit('move', $event)" v-if="showButton('move')">
-          <md-icon>open_with</md-icon>
-          <span>Move</span>
+          <md-icon>{{ moveIcon }}</md-icon>
+          <span>{{ moveText }}</span>
         </md-menu-item>
         <md-menu-item @click="$emit('rename', $event)" v-if="showButton('rename')">
-          <md-icon>create</md-icon>
-          <span>Rename</span>
+          <md-icon>{{ renameIcon }}</md-icon>
+          <span>{{ renameText }}</span>
         </md-menu-item>
         <md-menu-item @click="$emit('remove', $event)" v-if="showButton('remove')">
-          <md-icon>delete</md-icon>
+          <md-icon>{{ removeIcon }}</md-icon>
           <span>{{ removeText }}</span>
         </md-menu-item>
       </md-menu-content>
@@ -35,6 +35,26 @@
       type: {
         type: String,
         default: 'FILE',
+      },
+      moveIcon: {
+        type: String,
+        default: 'open_with',
+      },
+      moveText: {
+        type: String,
+        default: 'Move',
+      },
+      renameIcon: {
+        type: String,
+        default: 'create',
+      },
+      renameText: {
+        type: String,
+        default: 'Rename',
+      },
+      removeIcon: {
+        type: String,
+        default: 'delete',
       },
       removeText: {
         type: String,

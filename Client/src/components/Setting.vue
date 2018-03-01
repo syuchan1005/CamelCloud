@@ -110,10 +110,10 @@
         method: 'post',
         url: '/api',
         data: {
-          query: 'query{getUser{username password twitterId facebookId instagramId}}',
+          query: 'query{user{username password twitterId facebookId instagramId}}',
         },
       }).then((response) => {
-        this.user = response.data.data.getUser;
+        this.user = response.data.data.user;
       });
     },
     methods: {
