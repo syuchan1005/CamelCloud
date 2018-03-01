@@ -4,7 +4,7 @@
       <md-dialog-title>Select Directory</md-dialog-title>
 
       <md-dialog-content class="dialog-content">
-        <path-bar v-model="path" :icon="Config.separator.icon" :separator="Config.separator.value"
+        <path-bar v-model="path" :icon="pathIcon" :separator="pathSeparator"
                   @clickBack="backPath" @clickNewFolder="openNewDir" @clickPath="movePath" />
         <vue-perfect-scrollbar class="list">
           <md-list>
@@ -33,7 +33,6 @@
 
 <script>
   import VuePerfectScrollbar from 'vue-perfect-scrollbar';
-  import Config from '../../../../config';
   import PathBar from './PathBar';
 
   export default {
@@ -51,13 +50,20 @@
         type: Array,
         default: () => [],
       },
+      pathIcon: {
+        type: Boolean,
+        default: false,
+      },
+      pathSeparator: {
+        type: String,
+        default: '/',
+      },
     },
     data() {
       return {
         opened: false,
         dirList: [],
         newDir: '',
-        Config,
       };
     },
     watch: {

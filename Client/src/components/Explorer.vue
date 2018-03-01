@@ -47,7 +47,8 @@
     <md-dialog-prompt :md-title="dialog.title" :md-input-placeholder="dialog.placeholder"
                       :md-ok-text="dialog.okText" @close="closeDialog" v-model="dialog.value" ref="dialog"/>
 
-    <select-directory-dialog v-model="dialog.path" ref="selDirDialog" @close="closeDialog"/>
+    <select-directory-dialog v-model="dialog.path" ref="selDirDialog" @close="closeDialog"
+                            :path-icon="Config.separator.icon" :path-separator="Config.separator.value"/>
 
     <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)">
       Drop your picture
