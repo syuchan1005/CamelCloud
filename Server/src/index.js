@@ -44,6 +44,7 @@ const passport = new Passport(db);
 
 const apiRouter = new Router();
 
+// noinspection JSAccessibilityCheck
 apiRouter.all('/', async (ctx, next) => {
   if (ctx.isAuthenticated()) {
     await next();
@@ -56,7 +57,7 @@ const authRouter = passport.router;
 authRouter.get('/', async (ctx) => {
   ctx.status = 200;
   ctx.body = {
-    authed: ctx.isAuthenticated(),
+    auth: ctx.isAuthenticated(),
   };
   if (ctx.isAuthenticated()) ctx.body.userId = ctx.state.user.userId;
 });

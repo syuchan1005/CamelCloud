@@ -2,13 +2,13 @@ import Sequelize from 'sequelize';
 import debug from 'debug';
 import crypto from 'crypto';
 
-import { databaseURI } from '../../config';
+import { connectionURI } from '../../config';
 
 
 class DBManager {
   constructor() {
     this.logging = debug('camelcloud-db');
-    this.db = new Sequelize(databaseURI, {
+    this.db = new Sequelize(connectionURI, {
       logging: this.logging,
       operatorsAliases: Sequelize.Op,
     });

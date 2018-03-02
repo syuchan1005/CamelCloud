@@ -1,12 +1,18 @@
 module.exports = {
+  /* Other Service Callback URL */
   baseURL: 'http://localhost:3000',
+  /* true => GET /api (after login) */
   graphiql: false,
-  databaseURL: 'sqlite:test.db',
+  /* UserData store DB (can use postgres, mysql, sqlite, SQLServer) */
+  connectionURI: 'sqlite:test.db',
+  /* Files Save Directory */
   storage: 'Storage',
+  /* WebPage Explorer Path Separator */
   separator: {
     value: '/',
     icon: false,
   },
+  /* Login */
   auth: {
     local: {
       stretch: 1000,

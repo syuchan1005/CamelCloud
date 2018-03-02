@@ -2,18 +2,27 @@
 ## これはなに？
 あなたのマシン上で実行できるクラウドストレージ
 
-## 使い方
-
 ### インストール
+
+#### コンフィグのコピー
+
+```bash
+$ cd ...解凍したzipのPath
+$ cp template.config.js config.js
+$ $(Your favorite editor) config.js
+```
+
 #### クライアントのビルド
-```sh
+
+```bash
 $ cd ...解凍したzipのPath
 $ cd Client
 $ npm install
 $ npm build
 ```
 #### サーバーのビルド
-```sh
+
+```bash
 $ cd ...解凍したzipのPath
 $ cd Server
 $ npm install
@@ -21,6 +30,9 @@ $ npm build
 ```
 
 ### 起動
-```sh
-$ cd Server && npm start
+
+```bash
+$ cd ...解凍したzipのPath
+$ cd Server
+$ npm start
 ```

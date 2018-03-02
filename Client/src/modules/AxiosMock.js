@@ -15,7 +15,7 @@ class AxiosMock {
       return [500];
     });
     this.mock.onGet('/api/auth').reply(200, {
-      authed: true,
+      auth: true,
       userId: 1,
     });
     this.mock.onGet('/api/logout').reply(302, {}, {
