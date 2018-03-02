@@ -12,8 +12,8 @@
 
     <vue-perfect-scrollbar :settings="{ suppressScrollY: true }" class="value-wrapper" ref="value-wrapper">
       <div class="value" ref="value">
-        <div v-if="icon" @click="clickSeparator(i + 1, $event)"><md-icon class="sep">{{ separator }}</md-icon></div>
-        <div v-else class="sep" @click="clickSeparator(i + 1, $event)">{{ separator }}</div>
+        <div v-if="icon" @click="clickSeparator(0, $event)"><md-icon class="sep">{{ separator }}</md-icon></div>
+        <div v-else class="sep" @click="clickSeparator(0, $event)">{{ separator }}</div>
 
         <div v-for="(p, i) in path" :key="i" class="wrap">
           <div class="path-string" @click="$emit('clickPath', i)">{{ p }}</div>

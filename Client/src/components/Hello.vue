@@ -109,7 +109,11 @@
               password: pass,
             },
           }).then(() => this.$router.push({ path: '/check' }))
-            .catch(err => this.$snotify.error(err));
+            .catch(() => {
+              this.user.pass = '';
+              this.$refs['pass-input'].$el.focus();
+              this.$snotify.error('Invalid ID or Password.', 'Login Failed');
+            });
         } else {
           this.$refs[`${this.user.username ? 'pass' : 'id'}-input`].$el.focus();
           this.user.pass = '';

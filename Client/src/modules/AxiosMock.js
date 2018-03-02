@@ -7,7 +7,13 @@ class AxiosMock {
   }
 
   authRoute() {
-    this.mock.onPost('/api/auth/local').reply(200);
+    this.mock.onPost('/api/auth/local').reply((config) => {
+      const data = JSON.parse(config.data);
+      if (data.username === 'test' && data.password === '00602034e611c5c7e0c5b5e4fe6b8f27a0b7651ec26f55a0d76ffd9b7d21c276') { // name=test,pass=test
+        return [200];
+      }
+      return [500];
+    });
     this.mock.onGet('/api/auth').reply(200, {
       authed: true,
       userId: 1,
