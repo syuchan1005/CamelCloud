@@ -27,7 +27,7 @@
               @rename="renameFile(file)" />
         <file v-if="$store.state.viewFilter === 'trash'"  v-for="(file, index) in files" :key="index" :name="file.name"
               :type="file.type" @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
-              remove-icon="delete_forever" remove-text="Delete"/>
+              remove-icon="delete_forever" remove-text="Delete" move-text="Restore"/>
       </div>
     </vue-perfect-scrollbar>
 

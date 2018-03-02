@@ -127,6 +127,7 @@
 
   .md-dialog-content {
     width: 45vw;
+    min-width: 280px;
     overflow: hidden;
 
     .list {

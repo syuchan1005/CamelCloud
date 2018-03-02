@@ -25,13 +25,14 @@
     </vue-perfect-scrollbar>
 
 
-    <div class="menu-back" v-if="menuOpen" @click="closeDirList"></div>
-    <div class="md-menu-content md-active menu" :style="menu" v-if="menuOpen">
-      <md-list>
-        <md-list-item v-for="(dir, index) in dirList" :key="index" @click="closeDirList(index)">
-          {{ dir.name }}
-        </md-list-item>
-      </md-list>
+    <div class="menu-back" :style="menuBackStyle" @click="closeDirList" ref="menuBack">
+      <div class="md-menu-content md-active menu" v-show="menuOpen" :style="menuStyle">
+        <md-list>
+          <md-list-item v-for="(dir, index) in dirList" :key="index" @click="closeDirList(index)">
+            {{ dir.name }}
+          </md-list-item>
+        </md-list>
+      </div>
     </div>
   </div>
 </template>
@@ -82,11 +83,25 @@
       return {
         dirList: [],
         menu: {
-          top: '0px',
-          left: '0px',
+          top: 0,
+          left: 0,
         },
         menuOpen: false,
       };
+    },
+    computed: {
+      menuStyle() {
+        return {
+          top: `${this.menu.top}px`,
+          left: `${this.menu.left}px`,
+        };
+      },
+      menuBackStyle() {
+        return this.menuOpen ? {
+          width: '100%',
+          height: '100%',
+        } : undefined;
+      },
     },
     methods: {
       showButton(event) {
@@ -94,8 +109,10 @@
         return this._events[event] && this._events[event].length > 0;
       },
       clickSeparator(index, event) {
-        this.menu.top = `${event.clientY + 10}px`;
-        this.menu.left = `${event.clientX + 10}px`;
+        this.menuOpen = false;
+        const rect = this.$refs.menuBack.getBoundingClientRect();
+        this.menu.top = (event.y - rect.y) + 10;
+        this.menu.left = (event.x - rect.x) + 10;
         this.$http({
           method: 'post',
           url: '/api',
@@ -119,18 +136,20 @@
 </script>
 
 <style lang="scss">
-  .path > .value-wrapper {
-    .ps__scrollbar-x-rail {
-      width: 100% !important;
-      height: 13px !important;
-      display: block;
+  .path {
+    .value-wrapper {
+      .ps__scrollbar-x-rail {
+        width: 100% !important;
+        height: 13px !important;
+        display: block;
 
-      background-color: #EEEEEE;
-      opacity: 0.9;
+        background-color: #EEEEEE;
+        opacity: 0.9;
 
-      .ps__scrollbar-x {
-        height: 9px !important;
-        background-color: #999999;
+        .ps__scrollbar-x {
+          height: 9px !important;
+          background-color: #999999;
+        }
       }
     }
   }
@@ -148,18 +167,16 @@
     justify-content: flex-start;
     align-items: center;
 
-    .menu {
-      z-index: 6;
-      position: absolute;
-    }
-
     .menu-back {
       z-index: 5;
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      background-color: rgba(210, 210, 210, 0.1);
+
+      .menu {
+        position: relative;
+      }
     }
 
     .md-button {
