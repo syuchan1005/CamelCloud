@@ -18,7 +18,6 @@ import 'vue-awesome/icons/facebook';
 import 'vue-awesome/icons/instagram';
 import 'vue-awesome/icons/folder-open';
 
-import AxiosMock from './modules/AxiosMock';
 import titleMixin from './modules/titleMixin';
 import App from './App';
 import router from './router';
@@ -35,8 +34,11 @@ Vue.use(Snotify, {
 });
 
 if (process.env.NODE_ENV !== 'production') {
-  const mock = new AxiosMock(axios); // eslint-disable-line
+  /* eslint-disable no-new,global-require */
+  const AxiosMock = require('./modules/AxiosMock').default;
+  new AxiosMock(axios);
 }
+
 Vue.use(VueAxios, axios);
 
 Vue.component('icon', Icon);

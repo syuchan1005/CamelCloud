@@ -58,7 +58,7 @@ class AxiosMock {
           } else {
             for (let i = 0; i < 10; i += 1) {
               files.push({
-                name: `${query.files.folderType}${query.files.fileFilter.substr(0, 1)}${query.files.fileFilter.substring(1).toLowerCase()}_${i}`,
+                name: `${query.files.folderType || ''}${query.files.fileFilter.substr(0, 1)}${query.files.fileFilter.substring(1).toLowerCase()}_${i}`,
                 type: query.files.fileFilter,
               });
             }
@@ -78,4 +78,5 @@ class AxiosMock {
   }
 }
 
+// noinspection JSUnusedGlobalSymbols
 export default AxiosMock;
