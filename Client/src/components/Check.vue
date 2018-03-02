@@ -1,34 +1,22 @@
 <template>
   <div class="check">
     <div class="empty">
-      <breeding-rhombus-spinner
-        :animation-duration="2000"
-        :size="120"
-        :color="variables.mainColor"
-      />
+      <md-spinner :md-size="150" :md-stroke="3" md-indeterminate/>
       <div class="title">Checking...</div>
     </div>
   </div>
 </template>
 
 <script>
-  import variables from '!!sass-variable-loader!./_variables.scss'; // eslint-disable-line import/no-webpack-loader-syntax
-  import { BreedingRhombusSpinner } from 'epic-spinners';
-
   export default {
-    components: {
-      BreedingRhombusSpinner,
-    },
     name: 'check',
-    data() {
-      return {
-        variables,
-      };
-    },
     mounted() {
       this.$http.get('/api/auth').then((response) => {
         this.$store.commit('setAuth', response.data);
         this.$router.push('/view');
+      }).catch(() => {
+        this.$snotify.error('Network Error', 'Login Failed');
+        this.$router.push('/login');
       });
     },
   };
@@ -36,12 +24,26 @@
 
 <style lang="scss" scoped>
   @import 'general';
-  @import 'variables';
+
   .check {
     @include emptyWrapper();
   }
 
-  .empty > .title {
-    margin-top: 30px;
+  .empty {
+    .title {
+      margin-top: 30px;
+    }
+  }
+</style>
+
+<style lang="scss">
+  @import 'variables';
+
+  .check > .empty {
+    .md-spinner > .md-spinner-draw {
+      .md-spinner-path {
+        stroke: $mainColor;
+      }
+    }
   }
 </style>

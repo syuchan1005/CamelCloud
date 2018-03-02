@@ -4,7 +4,7 @@ import store from '@/store';
 import Hello from '@/components/Hello';
 import Check from '@/components/Check';
 import Error from '@/components/Error';
-import CameraRoll from '@/components/Explorer';
+import Explorer from '@/components/Explorer';
 import Setting from '@/components/Setting';
 
 Vue.use(Router);
@@ -30,8 +30,8 @@ const router = new Router({
     },
     {
       path: '/view',
-      name: 'CameraRoll',
-      component: CameraRoll,
+      name: 'Explorer',
+      component: Explorer,
       meta: {
         auth: true,
         header: true,
