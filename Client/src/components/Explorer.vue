@@ -1,6 +1,6 @@
 <template>
   <div class="select-mode" @dragover.prevent="drag = true">
-    <path-bar v-model="path" :icon="Config.separator.icon" :separator="Config.separator.value"
+    <path-bar v-model="path" :icon="separator.icon" :separator="separator.value"
               @clickBack="backPath" @clickUploadFile="uploadFile" @clickNewFolder="openNewDir"
               @clickPath="movePath"/>
 
@@ -47,8 +47,9 @@
     <md-dialog-prompt :md-title="dialog.title" :md-input-placeholder="dialog.placeholder"
                       :md-ok-text="dialog.okText" @close="closeDialog" v-model="dialog.value" ref="dialog"/>
 
-    <select-directory-dialog v-model="dialog.path" ref="selDirDialog" @close="closeDialog"
-                            :path-icon="Config.separator.icon" :path-separator="Config.separator.value"/>
+    <select-directory-dialog v-model="dialog.path" @close="closeDialog"
+                             :path-icon="separator.icon" :path-separator="separator.value"
+                             ref="selDirDialog" />
 
     <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)">
       Drop your picture
@@ -59,7 +60,6 @@
 <script>
   import VuePerfectScrollbar from 'vue-perfect-scrollbar';
   import { mapGetters } from 'vuex';
-  import Config from '../../../config';
   import File from './modules/File';
   import SelectDirectoryDialog from './modules/SelectDirectoryDialog';
   import PathBar from './modules/PathBar';
@@ -91,7 +91,10 @@
           file: undefined,
         },
         drag: false,
-        Config,
+        separator: {
+          icon: CommonConfig.separator.icon,
+          value: CommonConfig.separator.value,
+        },
       };
     },
     computed: {

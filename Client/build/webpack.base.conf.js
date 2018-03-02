@@ -1,9 +1,11 @@
 'use strict';
 
 const path = require('path');
+const webpack = require('webpack');
 const utils = require('./utils');
 const config = require('../config');
 const vueLoaderConfig = require('./vue-loader.conf');
+const commonConfig = require('../../config');
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -74,4 +76,13 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'CommonConfig.auth.list': JSON.stringify(Object.keys(commonConfig.auth)
+        .filter((key) => key === 'local' || commonConfig.auth[key].enable)),
+      'CommonConfig.auth.local.stretch': JSON.stringify(commonConfig.auth.local.stretch),
+      'CommonConfig.separator.value': JSON.stringify(commonConfig.separator.value),
+      'CommonConfig.separator.icon': JSON.stringify(commonConfig.separator.icon),
+    }),
+  ],
 };

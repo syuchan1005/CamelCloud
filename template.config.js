@@ -9,7 +9,6 @@ module.exports = {
   },
   auth: {
     local: {
-      salt: 'passwordSalt',
       stretch: 1000,
     },
     twitter: {

@@ -14,23 +14,29 @@
         <md-button class="md-primary" @click="clickLogin" ref="login-button">Sign in or Sign up</md-button>
       </form>
 
-      <div class="login-label">or sign in with</div>
+      <div class="login-label" v-if="authList.length > 1">or sign in with</div>
 
-      <div class="auth">
-        <md-button class="md-clean twitter" @click="clickAuth('twitter')">
-          <icon name="twitter" scale="2.5"/>
-        </md-button>
-        <div>Twitter</div>
+      <div class="auth" v-if="authList.length > 1">
+        <div v-if="authList.includes('twitter')">
+          <md-button class="md-clean twitter" @click="clickAuth('twitter')">
+            <icon name="twitter" scale="2.5"/>
+          </md-button>
+          <div>Twitter</div>
+        </div>
 
-        <md-button class="md-clean facebook" @click="clickAuth('facebook')">
-          <icon name="facebook" scale="2.5"/>
-        </md-button>
-        <div>Facebook</div>
+        <div v-if="authList.includes('facebook')">
+          <md-button class="md-clean facebook" @click="clickAuth('facebook')">
+            <icon name="facebook" scale="2.5"/>
+          </md-button>
+          <div>Facebook</div>
+        </div>
 
-        <md-button class="md-clean instagram" @click="clickAuth('instagram')">
-          <icon name="instagram" scale="3"/>
-        </md-button>
-        <div>Instagram</div>
+        <div v-if="authList.includes('instagram')">
+          <md-button class="md-clean instagram" @click="clickAuth('instagram')">
+            <icon name="instagram" scale="3"/>
+          </md-button>
+          <div>Instagram</div>
+        </div>
       </div>
     </div>
 
@@ -60,7 +66,6 @@
 
 <script>
   import sha256 from 'js-sha256';
-  import config from '../../../config';
 
   export default {
     name: 'hello',
@@ -71,6 +76,7 @@
           username: '',
           pass: '',
         },
+        authList: CommonConfig.auth.list,
       };
     },
     mounted() {
@@ -92,7 +98,7 @@
       clickLogin() {
         if (this.user.username && this.user.pass) {
           let pass = this.user.pass;
-          for (let i = 0; i < config.auth.local.stretch; i += 1) {
+          for (let i = 0; i < CommonConfig.auth.local.stretch; i += 1) {
             pass = sha256(pass);
           }
           this.$http({
@@ -172,32 +178,38 @@
       flex-direction: column;
       flex-wrap: wrap;
 
-      & > .md-button {
-        color: white !important;
-        border-radius: 15% !important;
-        min-width: 56px;
-        width: 56px;
-        min-height: 56px;
-        height: 56px;
-        padding: 0;
-
-        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
-      }
-
-      & > .twitter {
-        background: $twitterMain !important;
-      }
-
-      & > .facebook {
-        background: $facebookMain !important;
-      }
-
-      & > .instagram {
-        background: $instagramBack !important;
-
+      & > div {
         display: flex;
-        justify-content: center;
+        flex-direction: column;
         align-items: center;
+
+        .md-button {
+          color: white !important;
+          border-radius: 15% !important;
+          min-width: 56px;
+          width: 56px;
+          min-height: 56px;
+          height: 56px;
+          padding: 0;
+
+          box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+        }
+
+        .twitter {
+          background: $twitterMain !important;
+        }
+
+        .facebook {
+          background: $facebookMain !important;
+        }
+
+        .instagram {
+          background: $instagramBack !important;
+
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
       }
     }
   }

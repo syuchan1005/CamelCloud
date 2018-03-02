@@ -92,7 +92,6 @@
 
 <script>
   import sha256 from 'js-sha256';
-  import config from '../../../config';
 
   export default {
     name: 'setting',
@@ -126,7 +125,7 @@
         if (this.dialog.oldPassword && this.dialog.newPassword) {
           let oldPass = this.dialog.oldPassword;
           let newPass = this.dialog.newPassword;
-          for (let i = 0; i < config.auth.local.stretch; i += 1) {
+          for (let i = 0; i < CommonConfig.auth.local.stretch; i += 1) {
             oldPass = sha256(oldPass);
             newPass = sha256(newPass);
           }

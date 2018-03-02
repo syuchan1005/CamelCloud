@@ -59,7 +59,6 @@
   </div>
 </template>
 
-<!--suppress JSUnusedGlobalSymbols -->
 <script>
   export default {
     name: 'app',
