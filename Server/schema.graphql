@@ -56,5 +56,5 @@ type Query {
 
 type Mutation {
     updateUser(data: InputUser): User
-    operateFile(data: OperateFile): [File!]!
+    operateFile(data: OperateFile, fileFilter: FileType): [File!]!
 }

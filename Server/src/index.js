@@ -14,6 +14,7 @@ import GraphQL from './GraphQL';
 import Config from './../../config';
 import ServerConfig from '../config';
 import DBManager from './DBManager';
+import Thumbnail from './Thumbnail';
 
 const app = new Koa();
 
@@ -76,6 +77,10 @@ apiRouter.post('/upload', async (ctx, next) => {
     ctx.throw(401);
   }
 }, upload.array('files'), async (ctx) => {
+  await Promise.all(ctx.req.files.map((file) => {
+    const dist = file.destination.substr(0, file.destination.length - ctx.req.body.path.length);
+    return Thumbnail.createThumbnail(dist, `${ctx.req.body.path}/${file.filename}`);
+  }));
   ctx.status = 200;
 });
 

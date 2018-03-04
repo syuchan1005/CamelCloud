@@ -5,6 +5,7 @@ import { buildSchema } from 'graphql';
 import graphqlHTTP from 'koa-graphql';
 import Config from '../../config';
 import DBManager from './DBManager';
+import Thumbnail from './Thumbnail';
 
 class GraphQL {
   constructor(dbManager) {
@@ -59,7 +60,7 @@ class GraphQL {
   }
 
   // noinspection JSUnusedGlobalSymbols
-  async operateFile({ data }, ctx) {
+  async operateFile({ data, fileFilter }, ctx) {
     try {
       const user = await this.db.getUser(ctx.state.user.userId);
       const basePath = `../${Config.storage}/${user.dirName}`;
@@ -68,12 +69,20 @@ class GraphQL {
         case 'MKDIR':
           await fs.ensureDir(`${basePath}/${data.path}/${data.source}`);
           break;
-        case 'RENAME':
+        case 'RENAME': {
+          const beforePath = `${basePath}/${data.path}/${data.source}`;
+          if (fs.statSync(beforePath).isFile()) {
+            await fs.move(
+              Thumbnail.getFilePath(basePath, `${data.path}/${data.source}`),
+              Thumbnail.getFilePath(basePath, `${data.path}/${data.target}`),
+            );
+          }
           await fs.rename(
-            `${basePath}/${data.path}/${data.source}`,
+            beforePath,
             `${basePath}/${data.path}/${data.target}`,
           );
           break;
+        }
         case 'REMOVE': {
           const ext = nodePath.extname(data.source);
           let name = data.source.substring(0, data.source.length - ext.length);
@@ -81,36 +90,54 @@ class GraphQL {
           const suffix = ext.length === 0 ? '' : ext;
           try {
             await fs.access(`${basePath}_Trash/${name}${suffix}`);
-            name += ` ${dateformat(Date.now(), 'isoTime')}`;
+            name += ` ${dateformat(Date.now(), 'HH-MM-ss')}`;
             await fs.access(`${basePath}_Trash/${name}${suffix}`);
             for (i = 2; i < 10; i += 1) {
               fs.accessSync(`${basePath}_Trash/${name}(${i})${suffix}`);
             }
             return Promise.reject(new Error('Failed'));
           } catch (err) {
-            await fs.move(
-              `${basePath}/${data.path}/${data.source}`,
-              err.path,
-            );
+            const beforePath = `${basePath}/${data.path}/${data.source}`;
+            if (fs.statSync(beforePath).isFile()) {
+              await fs.move(
+                Thumbnail.getFilePath(basePath, `${data.path}/${data.source}`),
+                Thumbnail.getFilePath(basePath, `${name}${i ? `(${i})` : ''}${suffix}`, 'TRASH'),
+              );
+            }
+            await fs.move(beforePath, err.path);
           }
           break;
         }
-        case 'DELETE':
-          await fs.remove(`${basePath}_Trash/${data.path}/${data.source}`);
+        case 'DELETE': {
+          const deletePath = `${basePath}_Trash/${data.path}/${data.source}`;
+          if (fs.statSync(deletePath).isFile()) {
+            await fs.remove(Thumbnail.getFilePath(basePath, `${data.path}/${data.source}`, 'TRASH'));
+          }
+          await fs.remove(deletePath);
           folderType = 'TRASH';
           break;
-        case 'MOVE':
+        }
+        case 'MOVE': {
+          const beforePath = `${basePath}${data.sourceFolder === 'TRASH' ? '_Trash' : ''}/${data.path}/${data.source}`;
+          if (fs.statSync(beforePath).isFile()) {
+            await fs.move(
+              Thumbnail.getFilePath(basePath, `${data.path}/${data.source}`, data.sourceFolder),
+              Thumbnail.getFilePath(basePath, `${data.target}/${data.source}`),
+            );
+          }
           await fs.move(
-            `${basePath}${data.sourceFolder === 'TRASH' ? '_Trash' : ''}/${data.path}/${data.source}`,
+            beforePath,
             `${basePath}/${data.target}/${data.source}`,
           );
           folderType = data.sourceFolder;
           break;
+        }
         default:
       }
       return await this.files({
         path: data.path,
         folderType,
+        fileFilter,
       }, ctx);
     } catch (e) {
       return Promise.reject(e);
