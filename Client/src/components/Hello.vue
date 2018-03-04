@@ -48,7 +48,7 @@
       <md-menu-content>
         <div class="author-card">
           <md-avatar class="md-large">
-            <img src="https://github.com/syuchan1005.png" alt="syu_chan_1005">
+            <img src="@/assets/head.png" alt="syu_chan_1005" class="avatar">
           </md-avatar>
 
           <div class="author-card-info">
@@ -234,6 +234,10 @@
 
     .md-avatar {
       margin-right: 16px;
+
+      .avatar {
+        image-rendering: pixelated;
+      }
     }
 
     .author-card-info {
