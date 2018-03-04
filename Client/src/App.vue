@@ -69,12 +69,12 @@
           {
             label: 'Explorer',
             icon: 'photo_library',
-            name: 'all',
+            name: 'NORMAL',
           },
           {
             label: 'Trash',
             icon: 'delete',
-            name: 'trash',
+            name: 'TRASH',
           },
         ],
         innerWidth: window.innerWidth,
@@ -105,7 +105,7 @@
     watch: {
       under480(oldVal, newVal) {
         if (oldVal && !newVal && !this.$store.state.viewFilter) {
-          this.$store.commit('viewFilter', 'all');
+          this.$store.commit('viewFilter', 'NORMAL');
         }
       },
     },

@@ -5,7 +5,7 @@
               @clickPath="movePath"/>
 
     <div class="empty-wrapper" v-if="!files.length">
-      <div class="empty" @click="uploadFile" v-if="viewFilter === 'all'">
+      <div class="empty" @click="uploadFile" v-if="viewFilter === 'NORMAL'">
         <md-icon>library_books</md-icon>
         <div class="title">Add your first photo</div>
 
@@ -14,7 +14,7 @@
           or create directory
         </md-button>
       </div>
-      <div class="empty" v-if="viewFilter === 'trash'">
+      <div class="empty" v-if="viewFilter === 'TRASH'">
         <md-icon>delete_sweep</md-icon>
         <div class="title">No Item</div>
       </div>
@@ -22,10 +22,10 @@
 
     <vue-perfect-scrollbar v-if="files.length" class="files-wrapper" @contextmenu.native.prevent="click($event)">
       <div class="files">
-        <file v-if="$store.state.viewFilter === 'all'" v-for="(file, index) in files" :key="index" :name="file.name"
+        <file v-if="$store.state.viewFilter === 'NORMAL'" v-for="(file, index) in files" :key="index" :name="file.name"
               :type="file.type" @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
               @rename="renameFile(file)" />
-        <file v-if="$store.state.viewFilter === 'trash'"  v-for="(file, index) in files" :key="index" :name="file.name"
+        <file v-if="$store.state.viewFilter === 'TRASH'"  v-for="(file, index) in files" :key="index" :name="file.name"
               :type="file.type" @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
               remove-icon="delete_forever" remove-text="Delete" move-text="Restore"/>
       </div>
@@ -104,7 +104,7 @@
     },
     mounted() {
       if (!this.under480 && !this.viewFilter) {
-        this.$store.commit('viewFilter', 'all');
+        this.$store.commit('viewFilter', 'NORMAL');
       } else {
         this.getFiles();
       }
@@ -123,7 +123,7 @@
           method: 'post',
           url: '/api',
           data: {
-            query: `query{files(path:"/${this.path.join('/')}"${this.viewFilter === 'trash' ? ' folderType:TRASH' : ''}){name type}}`,
+            query: `query{files(path:"/${this.path.join('/')}"${this.viewFilter === 'TRASH' ? ' folderType:TRASH' : ''}){name type}}`,
           },
         }).then((response) => {
           this.files = response.data.data.files;
@@ -146,7 +146,7 @@
           input += `,source:"${this.dialog.file}",target:"${this.dialog.value}"`;
         } else if (this.dialog.op === 'MOVE') {
           input += `,source:"${this.dialog.file}",target:"${this.dialog.path.join('/')}"`;
-          if (this.viewFilter === 'trash') input += ',sourceFolder:TRASH';
+          if (this.viewFilter === 'TRASH') input += ',sourceFolder:TRASH';
         } else {
           input += `,source:"${this.dialog.value}"`;
         }
@@ -183,7 +183,7 @@
       },
       removeFile(file) {
         this.dialog = {
-          op: this.viewFilter === 'trash' ? 'DELETE' : 'REMOVE',
+          op: this.viewFilter === 'TRASH' ? 'DELETE' : 'REMOVE',
           value: file.name,
         };
         this.closeDialog('ok');
