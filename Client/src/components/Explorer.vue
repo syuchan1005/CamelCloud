@@ -52,7 +52,7 @@
                              ref="selDirDialog" />
 
     <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)">
-      Drop your picture
+      <div class="border">Drop to upload your files</div>
     </div>
   </div>
 </template>
@@ -281,8 +281,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: rgba(0, 0, 0, 1);
     background-color: rgba(0, 0, 0, 0.1);
-    font-size: 3rem;
+
+    .border {
+      width: 97%;
+      height: 97%;
+      color: rgba(0, 0, 0, 0.8);
+      font-size: 3rem;
+      border: 6px #ddd dashed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
   }
 </style>
