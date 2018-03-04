@@ -105,7 +105,7 @@
           method: 'post',
           url: '/api',
           data: {
-            query: `mutation {operateFile(data:{op:MKDIR,path:"${this.path.join('/')}",source:"${this.newDir}"} fileType:DIRECTORY){name}}`,
+            query: `mutation {operateFile(data:{op:MKDIR,path:"${this.path.join('/')}",source:"${this.newDir}"} fileFilter:DIRECTORY){name}}`,
           },
         }).then((response) => {
           this.dirList = response.data.data.operateFile;
