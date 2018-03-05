@@ -44,15 +44,25 @@ class GraphQL {
   // noinspection JSUnusedGlobalSymbols
   async files({ path, fileFilter, folderType }, ctx) {
     const user = await this.db.getUser(ctx.state.user.userId);
-    const savePath = `../${Config.storage}/${user.dirName}${folderType === 'TRASH' ? '_Trash' : ''}/${path}`;
+    const basePath = `../${Config.storage}/${user.dirName}`;
+    const savePath = `${basePath}${folderType === 'TRASH' ? '_Trash' : ''}/${path}`;
     const files = await fs.readdir(savePath).catch(() => undefined);
     if (files) {
       const map = files.map((value) => {
         const stat = fs.statSync(`${savePath}/${value}`);
-        return {
+        const data = {
           name: value,
           type: stat.isDirectory() ? 'DIRECTORY' : 'FILE',
         };
+        if (data.type === 'FILE') {
+          try {
+            fs.accessSync(Thumbnail.getFilePath(basePath, `${path}/${data.name}`, folderType));
+            data.thumb = true;
+          } catch (ignored) {
+            data.thumb = false;
+          }
+        }
+        return data;
       });
       return !fileFilter ? map : map.filter(value => value.type === fileFilter);
     }
@@ -142,6 +152,18 @@ class GraphQL {
     } catch (e) {
       return Promise.reject(e);
     }
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  async emptyTrash(args, ctx) {
+    const user = await this.db.getUser(ctx.state.user.userId);
+    const basePath = `../${Config.storage}/${user.dirName}`;
+    const files = await fs.readdir(`${basePath}_Trash`);
+    files.forEach((file) => {
+      fs.removeSync(`${basePath}_Trash/${file}`);
+      fs.removeSync(Thumbnail.getFilePath(basePath, file, 'TRASH'));
+    });
+    return [];
   }
 
   http() {

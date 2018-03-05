@@ -1,7 +1,10 @@
 <template>
   <div class="file" @click="$emit('click', $event)" @contextmenu.stop.prevent="$refs.menu.open()">
-    <div class="image" v-if="type === 'FILE'">Test</div>
-    <icon class="image" v-else name="folder-open"/>
+    <div class="image" v-if="type === 'FILE'">
+      <img v-if="hasThumbnail" :src="thumbnailURL" @error="hasThumbnail = false"/>
+      <icon v-else class="image file" name="file-o"/>
+    </div>
+    <icon class="image folder" v-else name="folder-open"/>
     <div class="name">{{ name }}</div>
 
     <md-menu ref="menu">
@@ -29,8 +32,15 @@
   export default {
     name: 'file',
     props: {
+      path: {
+        type: Array,
+      },
       name: {
         type: String,
+      },
+      thumb: {
+        type: Boolean,
+        default: false,
       },
       type: {
         type: String,
@@ -61,6 +71,16 @@
         default: 'Remove',
       },
     },
+    data() {
+      return {
+        thumbnailURL: '',
+        hasThumbnail: false,
+      };
+    },
+    mounted() {
+      this.thumbnailURL = `/api/file?path=${this.path.join('/')}/${this.name}${this.$store.state.viewFilter === 'TRASH' ? '&folder=TRASH' : ''}`;
+      this.hasThumbnail = this.thumb;
+    },
     methods: {
       showButton(event) {
         // eslint-disable-next-line no-underscore-dangle
@@ -76,17 +96,17 @@
 
   $size: 100px;
 
-  .file {
+  div.file {
     width: $size;
     min-width: $size;
     height: $size + 20px;
     max-height: $size + 20px;
     cursor: default;
     @include disableSelect;
-  }
 
-  .file:hover {
-    background-color: rgba(136, 136, 136, 0.1);
+    &:hover {
+      background-color: rgba(136, 136, 136, 0.1);
+    }
   }
 
   .image {
@@ -94,12 +114,19 @@
     min-width: $size;
     height: $size;
     text-align: center;
-    padding-top: calc(50% - 0.5rem);
-  }
+    padding: 5px;
 
-  .image.fa-icon {
-    color: $mainColor;
-    padding: 5px 5px 5px 10px;
+    &.folder {
+      color: $mainColor;
+      padding-left: 10px;
+    }
+
+    .file {
+      color: ($mainColor + $subColor) / 2;
+      width: $size * 0.9;
+      min-width: $size * 0.9;
+      height: $size * 0.9;
+    }
   }
 
   .name {

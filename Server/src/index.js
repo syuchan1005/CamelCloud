@@ -87,15 +87,15 @@ apiRouter.post('/upload', async (ctx, next) => {
 });
 
 /*
-body = {
+query = {
   type: ENUM = THUMBNAIL, // [RAW,THUMBNAIL]
   folder: ENUM = NORMAL, // [NORMAL,TRASH]
   path: String!,
 };
 */
-apiRouter.post('/file', async (ctx) => {
+apiRouter.get('/file', async (ctx) => {
   try {
-    const body = ctx.request.body;
+    const body = ctx.query;
     body.type = body.type || 'THUMBNAIL';
     body.folder = body.folder || 'NORMAL';
     if (!body.path) throw new Error('path Not Found');

@@ -15,6 +15,7 @@ import 'vue-awesome/icons/twitter';
 import 'vue-awesome/icons/facebook';
 import 'vue-awesome/icons/instagram';
 import 'vue-awesome/icons/folder-open';
+import 'vue-awesome/icons/file-o';
 
 import titleMixin from './modules/titleMixin';
 import App from './App';

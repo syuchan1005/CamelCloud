@@ -102,7 +102,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     new SWPrecacheWebpackPlugin({
       cacheId: 'camel_cloud',
       filename: 'service-worker.js',
-      staticFileGlobs: ['dist/**/*.{js,html,css,woff2,woff}'],
+      staticFileGlobs: ['dist/**/*.{js,html,css,woff2,woff,ttf,eot}'],
       minify: true,
       stripPrefix: 'dist/'
     })

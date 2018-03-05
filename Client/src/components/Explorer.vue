@@ -1,8 +1,12 @@
 <template>
   <div class="select-mode" @dragover.prevent="drag = true">
-    <path-bar v-model="path" :icon="separator.icon" :separator="separator.value"
+    <path-bar v-if="$store.state.viewFilter === 'NORMAL'"
+              v-model="path" :icon="separator.icon" :separator="separator.value"
               @clickBack="backPath" @clickUploadFile="uploadFile" @clickNewFolder="openNewDir"
-              @clickPath="movePath"/>
+              @clickPath="movePath" @clickReload="getFiles"/>
+    <path-bar v-if="$store.state.viewFilter === 'TRASH'"
+              v-model="path" :icon="separator.icon" :separator="separator.value"
+              @clickBack="backPath" @clickPath="movePath" @clickEmpty="emptyTrash" @clickReload="getFiles"/>
 
     <div class="empty-wrapper" v-if="!files.length">
       <div class="empty" @click="uploadFile" v-if="viewFilter === 'NORMAL'">
@@ -23,10 +27,11 @@
     <vue-perfect-scrollbar v-if="files.length" class="files-wrapper" @contextmenu.native.prevent="click($event)">
       <div class="files">
         <file v-if="$store.state.viewFilter === 'NORMAL'" v-for="(file, index) in files" :key="index" :name="file.name"
-              :type="file.type" @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
-              @rename="renameFile(file)" />
+              :type="file.type" :path="path" :thumb="file.thumb"
+              @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)" @rename="renameFile(file)" />
         <file v-if="$store.state.viewFilter === 'TRASH'"  v-for="(file, index) in files" :key="index" :name="file.name"
-              :type="file.type" @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
+              :type="file.type" :path="path" :thumb="file.thumb"
+              @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
               remove-icon="delete_forever" remove-text="Delete" move-text="Restore"/>
       </div>
     </vue-perfect-scrollbar>
@@ -123,7 +128,7 @@
           method: 'post',
           url: '/api',
           data: {
-            query: `query{files(path:"/${this.path.join('/')}"${this.viewFilter === 'TRASH' ? ' folderType:TRASH' : ''}){name type}}`,
+            query: `query{files(path:"/${this.path.join('/')}"${this.viewFilter === 'TRASH' ? ' folderType:TRASH' : ''}){name type thumb}}`,
           },
         }).then((response) => {
           this.files = response.data.data.files;
@@ -154,7 +159,7 @@
           method: 'post',
           url: '/api',
           data: {
-            query: `mutation{operateFile(data:${input}}){type name}}`,
+            query: `mutation{operateFile(data:${input}}){type name thumb}}`,
           },
         }).then((response) => {
           this.files = response.data.data.operateFile;
@@ -232,6 +237,17 @@
         if (this.path.length !== index + 1) {
           this.path = this.path.slice(0, index + 1);
         }
+      },
+      emptyTrash() {
+        this.$http({
+          method: 'post',
+          url: '/api',
+          data: {
+            query: 'mutation{emptyTrash{type name thumb}}',
+          },
+        }).then((response) => {
+          this.files = response.data.data.emptyTrash;
+        });
       },
     },
   };

@@ -59,14 +59,17 @@ class AxiosMock {
               files.push({
                 name: `${query.files.folderType || ''}File_${i}`,
                 type: 'FILE',
+                thumb: false,
               });
             }
           } else {
             for (let i = 0; i < 10; i += 1) {
-              files.push({
+              const data = {
                 name: `${query.files.folderType || ''}${query.files.fileFilter.substr(0, 1)}${query.files.fileFilter.substring(1).toLowerCase()}_${i}`,
                 type: query.files.fileFilter,
-              });
+              };
+              if (data.type === 'FILE') data.thumb = false;
+              files.push(data);
             }
           }
           return [200, { data: { files } }];

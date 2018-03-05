@@ -9,6 +9,12 @@
     <md-button v-if="showButton('clickNewFolder')" @click="$emit('clickNewFolder')">
       <md-icon>create_new_folder</md-icon>
     </md-button>
+    <md-button v-if="showButton('clickEmpty')" @click="$emit('clickEmpty')">
+      <md-icon>delete_forever</md-icon>
+    </md-button>
+    <md-button v-if="showButton('clickReload')" @click="$emit('clickReload')">
+      <md-icon>refresh</md-icon>
+    </md-button>
 
     <vue-perfect-scrollbar :settings="{ suppressScrollY: true }" class="value-wrapper" ref="value-wrapper">
       <div class="value" ref="value">

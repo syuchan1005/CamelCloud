@@ -31,6 +31,7 @@ type User {
 type File {
     name: String!
     type: FileType!
+    thumb: Boolean
 }
 
 input InputUser {
@@ -57,4 +58,5 @@ type Query {
 type Mutation {
     updateUser(data: InputUser): User
     operateFile(data: OperateFile, fileFilter: FileType): [File!]!
+    emptyTrash: [File!]!
 }
