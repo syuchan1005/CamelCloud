@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import nodePath from 'path';
 import opn from 'opn';
 import os from 'os';
 import Koa from 'koa';
@@ -6,6 +7,7 @@ import BodyParser from 'koa-bodyparser';
 import Session from 'koa-session';
 import Router from 'koa-router';
 import Serve from 'koa-static';
+import send from 'koa-send';
 import koaPassport from 'koa-passport';
 import multer from 'koa-multer';
 import historyApiFallback from 'koa2-connect-history-api-fallback';
@@ -82,6 +84,45 @@ apiRouter.post('/upload', async (ctx, next) => {
     return Thumbnail.createThumbnail(dist, `${ctx.req.body.path}/${file.filename}`);
   }));
   ctx.status = 200;
+});
+
+/*
+body = {
+  type: ENUM = THUMBNAIL, // [RAW,THUMBNAIL]
+  folder: ENUM = NORMAL, // [NORMAL,TRASH]
+  path: String!,
+};
+*/
+apiRouter.post('/file', async (ctx) => {
+  try {
+    const body = ctx.request.body;
+    body.type = body.type || 'THUMBNAIL';
+    body.folder = body.folder || 'NORMAL';
+    if (!body.path) throw new Error('path Not Found');
+    const user = await db.getUser(ctx.state.user.userId);
+    const basePath = `../${Config.storage}/${user.dirName}`;
+    let root;
+    let path;
+    switch (body.type) {
+      case 'RAW': {
+        path = body.path;
+        root = `${basePath}${body.folder === 'TRASH' ? '_Trash' : ''}`;
+        break;
+      }
+      case 'THUMBNAIL': {
+        path = Thumbnail.getFilePath(basePath, body.path, body.folder);
+        const fileName = Thumbnail.getFileName(body.path, body.folder);
+        root = nodePath.resolve(path.substring(0, path.length - fileName.length));
+        path = fileName;
+        break;
+      }
+      default: throw new Error('Invalid Folder');
+    }
+    if (fs.statSync(`${root}/${path}`).isDirectory()) throw new Error('path is directory');
+    await send(ctx, path, { root });
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 });
 
 const router = new Router();

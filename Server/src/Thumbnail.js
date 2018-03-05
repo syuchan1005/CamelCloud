@@ -23,11 +23,13 @@ class Thumbnail {
   }
 
   static getFileName(path, folderType) {
-    return this.sha256(nodePath.normalize(`${folderType || 'NORMAL'}/${nodePath.normalize(path)}`));
+    return `${this.sha256(nodePath.normalize(`${folderType || 'NORMAL'}/${nodePath.normalize(path)}`))}.png`;
   }
 
   static getFilePath(basePath, path, folderType) {
-    return nodePath.normalize(`${nodePath.normalize(basePath)}_thumbnail/${Thumbnail.getFileName(nodePath.normalize(path), (folderType || 'NORMAL'))}`);
+    let base = nodePath.posix.normalize(basePath);
+    if (base.endsWith('/')) base = base.substring(0, base.length - 1);
+    return nodePath.normalize(`${base}_Thumbnail/${Thumbnail.getFileName(nodePath.normalize(path), (folderType || 'NORMAL'))}`);
   }
 
   static sha256(text) {
