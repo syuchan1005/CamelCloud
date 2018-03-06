@@ -1,7 +1,7 @@
 <template>
   <div class="file" @click="$emit('click', $event)" @contextmenu.stop.prevent="$refs.menu.open()">
     <div class="image" v-if="type === 'FILE'">
-      <img v-if="hasThumbnail" :src="thumbnailURL" @error="hasThumbnail = false"/>
+      <img v-if="hasThumbnail" :src="thumbnailURL"/>
       <icon v-else class="image file" name="file-o"/>
     </div>
     <icon class="image folder" v-else name="folder-open"/>
@@ -40,6 +40,9 @@
         type: Array,
       },
       name: {
+        type: String,
+      },
+      viewFilter: {
         type: String,
       },
       thumb: {
@@ -85,17 +88,15 @@
     },
     data() {
       return {
-        thumbnailURL: '',
         hasThumbnail: false,
       };
     },
-    watch: {
-      name() {
-        this.thumbnailURL = `/api/file?path=${this.path.join('/')}/${this.name}${this.$store.state.viewFilter === 'TRASH' ? '&folder=TRASH' : ''}`;
+    computed: {
+      thumbnailURL() {
+        return `/api/file?path=${this.path.join('/')}/${this.name}${this.viewFilter === 'TRASH' ? '&folder=TRASH' : ''}`;
       },
     },
     mounted() {
-      this.thumbnailURL = `/api/file?path=${this.path.join('/')}/${this.name}${this.$store.state.viewFilter === 'TRASH' ? '&folder=TRASH' : ''}`;
       this.hasThumbnail = this.thumb;
     },
     methods: {

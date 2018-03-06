@@ -85,7 +85,7 @@ class GraphQL {
             await fs.move(
               Thumbnail.getFilePath(basePath, `${data.path}/${data.source}`),
               Thumbnail.getFilePath(basePath, `${data.path}/${data.target}`),
-            );
+            ).catch(() => undefined);
           }
           await fs.rename(
             beforePath,
@@ -112,7 +112,7 @@ class GraphQL {
               await fs.move(
                 Thumbnail.getFilePath(basePath, `${data.path}/${data.source}`),
                 Thumbnail.getFilePath(basePath, `${name}${i ? `(${i})` : ''}${suffix}`, 'TRASH'),
-              );
+              ).catch(() => undefined);
             }
             await fs.move(beforePath, err.path);
           }
@@ -121,7 +121,7 @@ class GraphQL {
         case 'DELETE': {
           const deletePath = `${basePath}_Trash/${data.path}/${data.source}`;
           if (fs.statSync(deletePath).isFile()) {
-            await fs.remove(Thumbnail.getFilePath(basePath, `${data.path}/${data.source}`, 'TRASH'));
+            await fs.remove(Thumbnail.getFilePath(basePath, `${data.path}/${data.source}`, 'TRASH')).catch(() => undefined);
           }
           await fs.remove(deletePath);
           folderType = 'TRASH';
@@ -133,7 +133,7 @@ class GraphQL {
             await fs.move(
               Thumbnail.getFilePath(basePath, `${data.path}/${data.source}`, data.sourceFolder),
               Thumbnail.getFilePath(basePath, `${data.target}/${data.source}`),
-            );
+            ).catch(() => undefined);
           }
           await fs.move(
             beforePath,
@@ -161,7 +161,9 @@ class GraphQL {
     const files = await fs.readdir(`${basePath}_Trash`);
     files.forEach((file) => {
       fs.removeSync(`${basePath}_Trash/${file}`);
-      fs.removeSync(Thumbnail.getFilePath(basePath, file, 'TRASH'));
+      try {
+        fs.removeSync(Thumbnail.getFilePath(basePath, file, 'TRASH'));
+      } catch (ignored) { /* ignore */ }
     });
     return [];
   }

@@ -10,6 +10,7 @@ import Serve from 'koa-static';
 import send from 'koa-send';
 import koaPassport from 'koa-passport';
 import multer from 'koa-multer';
+import koaRange from 'koa-range';
 import historyApiFallback from 'koa2-connect-history-api-fallback';
 import Passport from './Passport';
 import GraphQL from './GraphQL';
@@ -26,6 +27,7 @@ app.use(BodyParser());
 app.use(Session({}, app));
 app.use(koaPassport.initialize());
 app.use(koaPassport.session());
+app.use(koaRange);
 
 const db = new DBManager();
 
@@ -81,7 +83,7 @@ apiRouter.post('/upload', async (ctx, next) => {
 }, upload.array('files'), async (ctx) => {
   await Promise.all(ctx.req.files.map((file) => {
     const dist = file.destination.substr(0, file.destination.length - ctx.req.body.path.length);
-    return Thumbnail.createThumbnail(dist, `${ctx.req.body.path}/${file.filename}`);
+    return Thumbnail.createThumbnail(dist, `${ctx.req.body.path}/${file.filename}`).catch(() => undefined);
   }));
   ctx.status = 200;
 });
@@ -94,35 +96,39 @@ query = {
 };
 */
 apiRouter.get('/file', async (ctx) => {
-  try {
-    const body = ctx.query;
-    body.type = body.type || 'THUMBNAIL';
-    body.folder = body.folder || 'NORMAL';
-    if (!body.path) throw new Error('path Not Found');
-    const user = await db.getUser(ctx.state.user.userId);
-    const basePath = `../${Config.storage}/${user.dirName}`;
-    let root;
-    let path;
-    switch (body.type) {
-      case 'RAW': {
-        path = body.path;
-        root = `${basePath}${body.folder === 'TRASH' ? '_Trash' : ''}`;
-        break;
-      }
-      case 'THUMBNAIL': {
-        path = Thumbnail.getFilePath(basePath, body.path, body.folder);
-        const fileName = Thumbnail.getFileName(body.path, body.folder);
-        root = nodePath.resolve(path.substring(0, path.length - fileName.length));
-        path = fileName;
-        break;
-      }
-      default: throw new Error('Invalid Folder');
-    }
-    if (fs.statSync(`${root}/${path}`).isDirectory()) throw new Error('path is directory');
-    await send(ctx, path, { root });
-  } catch (err) {
-    ctx.throw(400, err);
+  const body = ctx.query;
+  body.type = body.type || 'THUMBNAIL';
+  body.folder = body.folder || 'NORMAL';
+  if (!body.path) {
+    ctx.throw(400, 'path Not Found');
+    return;
   }
+  const user = await db.getUser(ctx.state.user.userId);
+  const basePath = `../${Config.storage}/${user.dirName}`;
+  let root;
+  let path;
+  switch (body.type) {
+    case 'RAW': {
+      path = body.path;
+      root = `${basePath}${body.folder === 'TRASH' ? '_Trash' : ''}`;
+      break;
+    }
+    case 'THUMBNAIL': {
+      path = Thumbnail.getFilePath(basePath, body.path, body.folder);
+      const fileName = Thumbnail.getFileName(body.path, body.folder);
+      root = nodePath.resolve(path.substring(0, path.length - fileName.length));
+      path = fileName;
+      break;
+    }
+    default:
+      ctx.throw(400, 'Invalid Folder');
+      return;
+  }
+  if (fs.statSync(`${root}/${path}`).isDirectory()) {
+    ctx.throw(400, 'path is directory');
+    return;
+  }
+  await send(ctx, path, { root });
 });
 
 const router = new Router();
