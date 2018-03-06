@@ -77,6 +77,11 @@
         hasThumbnail: false,
       };
     },
+    watch: {
+      name() {
+        this.thumbnailURL = `/api/file?path=${this.path.join('/')}/${this.name}${this.$store.state.viewFilter === 'TRASH' ? '&folder=TRASH' : ''}`;
+      },
+    },
     mounted() {
       this.thumbnailURL = `/api/file?path=${this.path.join('/')}/${this.name}${this.$store.state.viewFilter === 'TRASH' ? '&folder=TRASH' : ''}`;
       this.hasThumbnail = this.thumb;
