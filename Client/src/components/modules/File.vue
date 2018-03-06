@@ -11,6 +11,10 @@
       <!--suppress HtmlUnknownAttribute -->
       <div md-menu-trigger></div>
       <md-menu-content>
+        <md-menu-item @click="$emit('download', $event)" v-if="showButton('download')">
+          <md-icon>{{ downloadIcon }}</md-icon>
+          <span>{{ downloadText }}</span>
+        </md-menu-item>
         <md-menu-item @click="$emit('move', $event)" v-if="showButton('move')">
           <md-icon>{{ moveIcon }}</md-icon>
           <span>{{ moveText }}</span>
@@ -45,6 +49,14 @@
       type: {
         type: String,
         default: 'FILE',
+      },
+      downloadIcon: {
+        type: String,
+        default: 'file_download',
+      },
+      downloadText: {
+        type: String,
+        default: 'Download',
       },
       moveIcon: {
         type: String,
