@@ -6,6 +6,7 @@ enum FileType {
 enum FolderType {
     NORMAL
     TRASH
+    # THUMBNAIL
 }
 
 enum FileOperations {

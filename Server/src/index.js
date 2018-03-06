@@ -18,6 +18,7 @@ import Config from './../../config';
 import ServerConfig from '../config';
 import DBManager from './DBManager';
 import Thumbnail from './Thumbnail';
+import Util from './Util';
 
 const app = new Koa();
 
@@ -34,7 +35,7 @@ const db = new DBManager();
 const uploadStorage = multer.diskStorage({
   async destination(request, file, callback) {
     const user = await db.getUser(request.user.userId);
-    const path = `../${Config.storage}/${user.dirName}/${request.body.path || ''}`;
+    const path = `${Util.dirPath(user, 'NORMAL')}/${request.body.path || ''}`;
     await fs.ensureDir(path);
     callback(null, path);
   },
@@ -81,10 +82,8 @@ apiRouter.post('/upload', async (ctx, next) => {
     ctx.throw(401);
   }
 }, upload.array('files'), async (ctx) => {
-  await Promise.all(ctx.req.files.map((file) => {
-    const dist = file.destination.substr(0, file.destination.length - ctx.req.body.path.length);
-    return Thumbnail.createThumbnail(dist, `${ctx.req.body.path}/${file.filename}`).catch(() => undefined);
-  }));
+  const user = await db.getUser(ctx.state.user.userId);
+  await Promise.all(ctx.req.files.map(file => Thumbnail.createThumbnail(user, `${ctx.req.body.path}/${file.filename}`).catch(() => undefined)));
   ctx.status = 200;
 });
 
@@ -104,17 +103,16 @@ apiRouter.get('/file', async (ctx) => {
     return;
   }
   const user = await db.getUser(ctx.state.user.userId);
-  const basePath = `../${Config.storage}/${user.dirName}`;
   let root;
   let path;
   switch (body.type) {
     case 'RAW': {
       path = body.path;
-      root = `${basePath}${body.folder === 'TRASH' ? '_Trash' : ''}`;
+      root = `${Util.dirPath(user, 'NORMAL')}/${body.folder}`;
       break;
     }
     case 'THUMBNAIL': {
-      path = Thumbnail.getFilePath(basePath, body.path, body.folder);
+      path = Thumbnail.getFilePath(user, body.path, body.folder);
       const fileName = Thumbnail.getFileName(body.path, body.folder);
       root = nodePath.resolve(path.substring(0, path.length - fileName.length));
       path = fileName;

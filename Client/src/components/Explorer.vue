@@ -11,7 +11,7 @@
     <div class="empty-wrapper" v-if="!files.length">
       <div class="empty" @click="uploadFile" v-if="viewFilter === 'NORMAL'">
         <md-icon>library_books</md-icon>
-        <div class="title">Add your first photo</div>
+        <div class="title">Add your files</div>
 
         <md-button class="md-raised newDir" @click.stop="openNewDir">
           <md-icon>add</md-icon>

@@ -2,14 +2,15 @@ import nodePath from 'path';
 import fs from 'fs-extra';
 import crypto from 'crypto';
 import ffmpeg from 'fluent-ffmpeg';
+import Util from "./Util";
 
 class Thumbnail {
-  static createThumbnail(basePath, path, folderType) {
+  static createThumbnail(user, path, folderType) {
     return new Promise((resolve, reject) => {
-      const outPath = this.getFilePath(basePath, path, folderType);
+      const outPath = this.getFilePath(user, path, folderType);
       fs.ensureDir(`${outPath}/../`).then(() => {
         ffmpeg()
-          .input(nodePath.normalize(`${basePath}/${path}`))
+          .input(nodePath.normalize(`${Util.dirPath(user, folderType || 'NORMAL')}/${path}`))
           .outputOption('-vframes 1')
           .videoFilter('scale=100:100:force_original_aspect_ratio=decrease,pad=100:100:(ow-iw)/2:(oh-ih)/2:white')
           .format('image2pipe')
@@ -23,13 +24,11 @@ class Thumbnail {
   }
 
   static getFileName(path, folderType) {
-    return `${this.sha256(nodePath.normalize(`${folderType || 'NORMAL'}/${nodePath.normalize(path)}`))}.png`;
+    return `${this.sha256(nodePath.posix.normalize(`${folderType || 'NORMAL'}/${nodePath.posix.normalize(`/${path}`)}`))}.png`;
   }
 
-  static getFilePath(basePath, path, folderType) {
-    let base = nodePath.posix.normalize(basePath);
-    if (base.endsWith('/')) base = base.substring(0, base.length - 1);
-    return nodePath.normalize(`${base}_Thumbnail/${Thumbnail.getFileName(nodePath.normalize(path), (folderType || 'NORMAL'))}`);
+  static getFilePath(user, path, folderType) {
+    return nodePath.posix.normalize(`${Util.dirPath(user, 'THUMBNAIL')}/${Thumbnail.getFileName(path, (folderType || 'NORMAL'))}`);
   }
 
   static sha256(text) {
