@@ -6,8 +6,8 @@ COPY . CamelCloud/
 
 WORKDIR CamelCloud/
 
-RUN cd Client && npm install \
-	&& cd ../Server && npm install
+RUN cd Client && npm install -D \
+	&& cd ../Server && npm install -D
 
 VOLUME /CamelCloud/config.js
 ENV PORT=80
