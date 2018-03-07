@@ -2,9 +2,9 @@ FROM node:9.7-alpine
 
 MAINTAINER syuchan1005 <syuchan.dev@gmail.com>
 
-COPY * /CamelCloud/
+COPY . CamelCloud/
 
-WORKDIR /CamelCloud/
+WORKDIR CamelCloud/
 
 RUN cd Client && npm install \
 	&& cd ../Server && npm install
