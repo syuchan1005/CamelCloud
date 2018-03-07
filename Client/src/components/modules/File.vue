@@ -89,15 +89,22 @@
     data() {
       return {
         hasThumbnail: false,
+        view: '',
       };
+    },
+    watch: {
+      name() {
+        this.view = this.viewFilter;
+      },
     },
     computed: {
       thumbnailURL() {
-        return `/api/file?path=${this.path.join('/')}/${this.name}${this.viewFilter === 'TRASH' ? '&folder=TRASH' : ''}`;
+        return `/api/file?path=${this.path.join('/')}/${this.name}${this.view === 'TRASH' ? '&folder=TRASH' : ''}`;
       },
     },
     mounted() {
       this.hasThumbnail = this.thumb;
+      this.view = this.viewFilter;
     },
     methods: {
       showButton(event) {

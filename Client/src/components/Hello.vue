@@ -80,6 +80,10 @@
       };
     },
     mounted() {
+      if (this.$store.state.auth.type) {
+        this.$snotify.error(`${this.$store.state.auth.type} User Not Found`, 'Login Failed');
+        this.$store.commit('authType', '');
+      }
       this.$store.commit('setAuth', {
         userId: undefined,
         login: false,
@@ -96,6 +100,7 @@
         button.focus();
       },
       clickLogin() {
+        this.$store.commit('authType', 'local');
         if (this.user.username && this.user.pass) {
           let pass = this.user.pass;
           for (let i = 0; i < CommonConfig.auth.local.stretch; i += 1) {
@@ -121,6 +126,7 @@
         }
       },
       clickAuth(service) {
+        this.$store.commit('authType', service);
         if (window.location.protocol === 'http:' || service === 'instagram') {
           window.location.href = `/api/auth/${service}`;
         } else {

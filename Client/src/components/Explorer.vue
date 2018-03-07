@@ -6,7 +6,7 @@
               @clickPath="movePath" @clickReload="getFiles"/>
     <path-bar v-if="$store.state.viewFilter === 'TRASH'"
               v-model="path" :icon="separator.icon" :separator="separator.value"
-              @clickBack="backPath" @clickPath="movePath" @clickEmpty="emptyTrash" @clickReload="getFiles"/>
+              @clickBack="backPath" @clickPath="movePath" @clickEmpty="openConfirmEmptyDialog" @clickReload="getFiles"/>
 
     <div class="empty-wrapper" v-if="!files.length">
       <div class="empty" @click="uploadFile" v-if="viewFilter === 'NORMAL'">
@@ -27,10 +27,10 @@
     <vue-perfect-scrollbar v-if="files.length" class="files-wrapper" @contextmenu.native.prevent="click($event)">
       <div class="files">
         <file v-if="$store.state.viewFilter === 'NORMAL'" v-for="(file, index) in files" :key="index" :name="file.name"
-              :type="file.type" :path="path" view-filter="{{$store.state.viewFilter}}" :thumb="file.thumb" @download="downloadFile(file)"
+              :type="file.type" :path="path" :view-filter="$store.state.viewFilter" :thumb="file.thumb" @download="downloadFile(file)"
               @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)" @rename="renameFile(file)" />
         <file v-if="$store.state.viewFilter === 'TRASH'"  v-for="(file, index) in files" :key="index" :name="file.name"
-              :type="file.type" :path="path" view-filter="{{$store.state.viewFilter}}" :thumb="file.thumb" @download="downloadFile(file)"
+              :type="file.type" :path="path" :view-filter="$store.state.viewFilter" :thumb="file.thumb" @download="downloadFile(file)"
               @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
               remove-icon="delete_forever" remove-text="Delete" move-text="Restore"/>
       </div>
@@ -55,6 +55,9 @@
     <select-directory-dialog v-model="dialog.path" @close="closeDialog"
                              :path-icon="separator.icon" :path-separator="separator.value"
                              ref="selDirDialog" />
+
+    <md-dialog-confirm md-content="Are you sure you want to permanently delete trash folder?"
+                       md-title="Delete files" @close="emptyTrash" ref="confirmEmptyDialog"/>
 
     <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)">
       <div class="border">Drop to upload your files</div>
@@ -254,7 +257,11 @@
           });
         }
       },
-      emptyTrash() {
+      openConfirmEmptyDialog() {
+        this.$refs.confirmEmptyDialog.open();
+      },
+      emptyTrash(state) {
+        if (state !== 'ok') return;
         this.$http({
           method: 'post',
           url: '/api',

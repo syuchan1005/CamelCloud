@@ -10,6 +10,7 @@ export default new Vuex.Store({
   state: {
     viewFilter: undefined,
     auth: {
+      type: '',
       login: false,
       userId: undefined,
     },
@@ -21,6 +22,9 @@ export default new Vuex.Store({
     setAuth(state, data) {
       state.auth.login = data.auth;
       state.auth.userId = data.userId;
+    },
+    authType(state, data) {
+      state.auth.type = data;
     },
   },
   getters: {

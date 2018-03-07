@@ -114,6 +114,7 @@
         this.innerWidth = window.innerWidth;
       },
       clickLogout() {
+        this.$store.commit('authType', '');
         this.$router.push({ path: '/' });
       },
     },
