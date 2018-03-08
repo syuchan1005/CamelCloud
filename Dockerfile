@@ -14,4 +14,4 @@ VOLUME /CamelCloud/config.js
 ENV PORT=80
 EXPOSE $PORT
 
-CMD ["cmd.sh"]
+CMD ["./cmd.sh"]
