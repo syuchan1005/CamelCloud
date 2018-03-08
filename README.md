@@ -2,6 +2,20 @@
 ## これはなに？
 あなたのマシン上で実行できるクラウドストレージ
 
+### Docker
+
+[Docker Hub](https://hub.docker.com/r/syuchan1005/camelcloud/)
+
+```bash
+docker pull syuchan1005/camelcloud
+```
+
+#### Environment
+
+|ENV Name|default|
+|:--|:--|
+|PORT|80|
+
 ### インストール
 
 #### コンフィグのコピー
@@ -18,7 +32,7 @@ $ $(Your favorite editor) config.js
 $ cd ...解凍したzipのPath
 $ cd Client
 $ npm install
-$ npm build
+$ npm run build
 ```
 #### サーバーのビルド
 
@@ -26,7 +40,7 @@ $ npm build
 $ cd ...解凍したzipのPath
 $ cd Server
 $ npm install
-$ npm build
+$ npm run build
 ```
 
 ### 起動
