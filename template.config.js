@@ -1,6 +1,6 @@
 module.exports = {
   /* Other Service Callback URL */
-  baseURL: 'http://localhost:3000',
+  baseURL: 'http://localhost:' + (process.env.PORT || 3000), // eslint-disable-line
   /* true => GET /api (after login) */
   graphiql: false,
   /* UserData store DB (can use postgres, mysql, sqlite, SQLServer) */
