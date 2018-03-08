@@ -7,12 +7,11 @@ COPY . CamelCloud/
 WORKDIR CamelCloud/
 
 RUN cd Client && npm install -D \
-	&& cd ../Server && npm install -D
+	&& cd ../Server && npm install -D \
+	&& cd ../ && chmod 775 cmd.sh
 
 VOLUME /CamelCloud/config.js
 ENV PORT=80
 EXPOSE $PORT
 
-CMD cd Client && npm build \
-	cd ../Server && npm build \
-	npm start
+CMD ["cmd.sh"]
