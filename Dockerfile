@@ -10,7 +10,7 @@ RUN cd Client && npm install -D \
 	&& cd ../Server && npm install -D \
 	&& cd ../ && chmod 775 cmd.sh
 
-VOLUME /CamelCloud/config.js
+VOLUME /data
 ENV PORT=80
 EXPOSE $PORT
 

@@ -144,7 +144,7 @@ app.use(Serve(`${__dirname}/../../Client/dist`));
 
 graphQL.db.authenticate()
   .then(async () => {
-    app.listen(process.env.POST || 3000, () => {
+    app.listen(process.env.PORT || 3000, () => {
       if (ServerConfig.isOpenBrowser) {
         const osType = os.type().toString();
         if (osType.match('Windows') !== null) {

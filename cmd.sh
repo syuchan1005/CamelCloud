@@ -1,18 +1,23 @@
-#!/bin/bash
+#!/bin/sh
 
-if [ ! -e config.js ]
+if [ -e /data/config.js ]
 then
-  cp template.config.js config.js
+  cp /data/config.js config.js
+else
+  if [ ! -e config.js ]
+  then
+    cp ./template.config.js ./config.js
+  fi
 fi
 
 if [ ! -e Client/dist ]
 then
-  cd Client && npm build && cd ../
+  cd Client && npm run build && cd ../
 fi
 
 if [ ! -e Server/dist ]
 then
-  cd Server && npm build && cd ../
+  cd Server && npm run build && cd ../
 fi
 
-cd Server && npm start
+cd Server && npm run start
