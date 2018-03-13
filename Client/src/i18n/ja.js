@@ -74,8 +74,4 @@ export default {
     goTop: 'トップに戻る',
     afterSec: '{time} 秒後に戻ります',
   },
-  lang: {
-    en: '英語',
-    ja: '日本語',
-  },
 };

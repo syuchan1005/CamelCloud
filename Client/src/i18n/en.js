@@ -74,8 +74,4 @@ export default {
     goTop: 'Go to TopPage',
     afterSec: 'Go after {time} seconds',
   },
-  lang: {
-    en: 'English',
-    ja: 'Japanese',
-  },
 };

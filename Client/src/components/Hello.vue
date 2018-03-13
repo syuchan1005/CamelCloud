@@ -42,10 +42,10 @@
 
     <md-button-toggle md-single>
       <md-button :class="{ 'md-toggle': $store.state.locale === 'en'}" @click="$store.commit('locale', 'en')">
-        {{ $t('lang.en') }}
+        English
       </md-button>
       <md-button :class="{ 'md-toggle': $store.state.locale === 'ja'}" @click="$store.commit('locale', 'ja')">
-        {{ $t('lang.ja') }}
+        日本語
       </md-button>
     </md-button-toggle>
 
