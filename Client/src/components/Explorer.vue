@@ -8,7 +8,7 @@
               v-model="path" :icon="separator.icon" :separator="separator.value"
               @clickBack="backPath" @clickPath="movePath" @clickEmpty="openConfirmEmptyDialog" @clickReload="getFiles"/>
 
-    <div class="empty-wrapper" v-if="!files.length">
+    <div class="empty-wrapper" v-if="!(files.length || uploadFiles.length)">
       <div class="empty" @click="uploadFile" v-if="viewFilter === 'NORMAL'">
         <md-icon>library_books</md-icon>
         <div class="title">{{ $t('explorer.add') }}</div>
@@ -24,19 +24,21 @@
       </div>
     </div>
 
-    <vue-perfect-scrollbar v-if="files.length" class="files-wrapper" @contextmenu.native.prevent="click($event)">
+    <vue-perfect-scrollbar v-else class="files-wrapper" @contextmenu.native.prevent="click($event)">
       <div class="files">
         <file v-if="$store.state.viewFilter === 'NORMAL'" v-for="(file, index) in files" :key="index" :name="file.name"
               :type="file.type" :thumbnail-url="file.thumbnailUrl"
               :download-text="$t('explorer.file.downloadText')" :move-text="$t('explorer.file.moveText')"
               :rename-text="$t('explorer.file.renameText')" :remove-text="$t('explorer.file.removeText')"
               @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)" @rename="renameFile(file)"
-              @download="downloadFile(file)" @drop="dropDir($event, file)" @dragstart="dragFile = file" />
+              @download="downloadFile(file)" @drop="dropDir($event, file)" @dragstart="dragFile = file"/>
         <file v-if="$store.state.viewFilter === 'TRASH'" v-for="(file, index) in files" :key="index" :name="file.name"
               :type="file.type" :thumbnail-url="file.thumbnailUrl"
               @download="downloadFile(file)" @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
               remove-icon="delete_forever" :remove-text="$t('explorer.file.deleteText')"
-              :move-text="$t('explorer.file.restoreText')" :download-text="$t('explorer.file.downloadText')" />
+              :move-text="$t('explorer.file.restoreText')" :download-text="$t('explorer.file.downloadText')"/>
+
+        <upload-file v-for="(file, index) in uploadFiles" :key="index" :name="file.name" :progress="file.progress"/>
       </div>
     </vue-perfect-scrollbar>
 
@@ -54,16 +56,20 @@
 
     <!--suppress RequiredAttributes -->
     <md-dialog-prompt :md-title="dialog.title" :md-input-placeholder="dialog.placeholder"
-                      :md-ok-text="dialog.okText" :md-cancel-text="$t('explorer.dialog.cancelText')" @close="closeDialog" v-model="dialog.value" ref="dialog"/>
+                      :md-ok-text="dialog.okText" :md-cancel-text="$t('explorer.dialog.cancelText')"
+                      @close="closeDialog" v-model="dialog.value" ref="dialog"/>
 
     <select-directory-dialog v-model="dialog.path" @close="closeDialog"
                              :path-icon="separator.icon" :path-separator="separator.value"
-                             :title="$t('explorer.dialog.selectDir.title')" :ok-text="$t('explorer.dialog.selectDir.okText')"
+                             :title="$t('explorer.dialog.selectDir.title')"
+                             :ok-text="$t('explorer.dialog.selectDir.okText')"
                              :cancel-text="$t('explorer.dialog.cancelText')"
                              ref="selDirDialog"/>
 
-    <md-dialog-confirm :md-title="$t('explorer.dialog.emptyTrash.title')" :md-content="$t('explorer.dialog.emptyTrash.content')"
-                       :md-ok-text="$t('explorer.dialog.emptyTrash.okText')" :md-cancel-text="$t('explorer.dialog.cancelText')"
+    <md-dialog-confirm :md-title="$t('explorer.dialog.emptyTrash.title')"
+                       :md-content="$t('explorer.dialog.emptyTrash.content')"
+                       :md-ok-text="$t('explorer.dialog.emptyTrash.okText')"
+                       :md-cancel-text="$t('explorer.dialog.cancelText')"
                        @close="emptyTrash" ref="confirmEmptyDialog"/>
 
     <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)"
@@ -77,12 +83,14 @@
   import VuePerfectScrollbar from 'vue-perfect-scrollbar';
   import { mapGetters } from 'vuex';
   import File from './modules/File';
+  import UploadFile from './modules/UploadFile';
   import SelectDirectoryDialog from './modules/SelectDirectoryDialog';
   import PathBar from './modules/PathBar';
 
   export default {
     components: {
       File,
+      UploadFile,
       VuePerfectScrollbar,
       SelectDirectoryDialog,
       PathBar,
@@ -93,6 +101,7 @@
       return {
         path: [],
         files: [],
+        uploadFiles: [],
         menu: {
           top: '0px',
           left: '0px',
@@ -230,14 +239,27 @@
         const formData = new FormData();
         formData.append('path', this.path.join('/'));
         const files = event.dataTransfer.files;
-        for (let i = 0; i < files.length; i += 1) {
+        const len = files.length;
+        for (let i = 0; i < len; i += 1) {
           formData.append('files', files[i]);
         }
+        if (len === 0) return;
+        const upFile = {
+          name: len === 1 ? files[0].name : this.$tc('explorer.fileCount', len, { count: len }),
+          progress: 0,
+        };
+        this.uploadFiles.push(upFile);
         this.$http({
           method: 'post',
           url: '/api/upload',
           data: formData,
-        }).then(this.getFiles);
+          onUploadProgress(progressEvent) {
+            upFile.progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          },
+        }).then(() => {
+          this.uploadFiles = this.uploadFiles.filter(file => file !== upFile);
+          this.getFiles();
+        });
       },
       uploadFile() {
         const element = document.createElement('input');
@@ -333,7 +355,7 @@
       display: flex;
       flex-wrap: wrap;
 
-      .file {
+      .file, .upload-file {
         margin: 10px;
       }
     }

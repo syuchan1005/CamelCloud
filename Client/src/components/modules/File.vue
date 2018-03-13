@@ -1,5 +1,5 @@
 <template>
-  <div class="file" draggable="true" @click="$emit('click', $event)" @contextmenu.stop.prevent="$refs.menu.open()"
+  <div class="file" :draggable="draggable" @click="$emit('click', $event)" @contextmenu.stop.prevent="$refs.menu.open()"
        @dragover.prevent="setEffect($event)" @drop.prevent="$emit('drop', $event)" @dragstart="$emit('dragstart', $event)">
     <div v-if="type === 'FILE'" class="image">
       <img v-if="thumbnailUrl && !errorThumb" draggable="false" :src="thumbnailUrl" @error="errorThumb = true"/>
@@ -79,6 +79,10 @@
       removeText: {
         type: String,
         default: 'Remove',
+      },
+      draggable: {
+        type: Boolean,
+        default: true,
       },
     },
     data() {

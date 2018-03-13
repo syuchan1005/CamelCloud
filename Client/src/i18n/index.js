@@ -8,7 +8,7 @@ import ja from './ja';
 Vue.use(VueI18n);
 
 const i18n = new VueI18n({
-  locale: navigator.language,
+  locale: store.state.locale || navigator.language,
   fallbackLocale: 'en',
   messages: {
     en,

@@ -57,6 +57,7 @@ export default {
       deleteText: '完全に削除',
     },
     dropUpload: 'アップロードするファイルをドロップ',
+    fileCount: 'ファイルがありません | 1個のファイル | {count}個のファイル',
   },
   setting: {
     back: '戻る',

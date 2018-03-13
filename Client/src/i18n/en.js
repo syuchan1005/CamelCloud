@@ -57,6 +57,7 @@ export default {
       deleteText: 'Delete',
     },
     dropUpload: 'Drop to upload your files',
+    fileCount: 'no files | 1 file | {count} files',
   },
   setting: {
     back: 'Back',
