@@ -8,7 +8,7 @@
     <icon v-else class="image folder" name="folder-open"/>
     <div class="name">{{ name }}</div>
 
-    <md-menu ref="menu">
+    <md-menu md-size="4" ref="menu">
       <!--suppress HtmlUnknownAttribute -->
       <div md-menu-trigger></div>
       <md-menu-content>
@@ -92,7 +92,7 @@
         return this._events[event] && this._events[event].length > 0;
       },
       setEffect(event) {
-        // eslint-disable-next-line
+        // eslint-disable-next-line no-param-reassign
         event.dataTransfer.dropEffect = this.type === 'FILE' ? 'none' : 'move';
       },
     },

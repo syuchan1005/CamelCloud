@@ -1,7 +1,7 @@
 <template>
   <div class="select-directory-dialog">
     <md-dialog ref="dialog">
-      <md-dialog-title>Select Directory</md-dialog-title>
+      <md-dialog-title>{{ title }}</md-dialog-title>
 
       <md-dialog-content class="dialog-content">
         <path-bar v-model="path" :icon="pathIcon" :separator="pathSeparator"
@@ -20,8 +20,8 @@
       </md-dialog-content>
 
       <md-dialog-actions>
-        <md-button class="md-primary" @click="close(false)">Cancel</md-button>
-        <md-button class="md-primary" @click="close(true)">Select</md-button>
+        <md-button class="md-primary" @click="close(false)">{{ cancelText }}</md-button>
+        <md-button class="md-primary" @click="close(true)">{{ okText }}</md-button>
       </md-dialog-actions>
     </md-dialog>
 
@@ -57,6 +57,18 @@
       pathSeparator: {
         type: String,
         default: '/',
+      },
+      title: {
+        type: String,
+        default: 'Select Directory',
+      },
+      okText: {
+        type: String,
+        default: 'Select',
+      },
+      cancelText: {
+        type: String,
+        default: 'Cancel',
       },
     },
     data() {

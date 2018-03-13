@@ -18,6 +18,7 @@
     "vue": "^2.5.2",
     "vue-awesome": "^2.3.4",
     "vue-axios": "^2.0.2",
+    "vue-i18n": "^7.5.0",
     "vue-material": "0.8.1",
     "vue-perfect-scrollbar": "^0.1.0",
     "vue-router": "^3.0.1",

@@ -2,10 +2,12 @@
   <div class="error">
     <div class="empty">
       <md-icon>error_outline</md-icon>
-      <div class="title">An error occurred</div>
+      <div class="title">{{ $t('error.title') }}</div>
     </div>
-    <md-button class="md-raised md-warn" @click="clickGo" ref="goButton">Go to TopPage</md-button>
-    <span>Go after {{ time }} seconds</span>
+    <md-button class="md-raised md-warn" @click="clickGo" ref="goButton">
+      {{ $t('error.goTop') }}
+    </md-button>
+    <span>{{ $t('error.afterSec', { time }) }}</span>
   </div>
 </template>
 
@@ -33,7 +35,7 @@
     },
     methods: {
       clickGo() {
-        this.$store.commit('viewFilter', undefined);
+        this.$store.commit('authType', '');
         this.$router.push({ path: '/' });
       },
     },

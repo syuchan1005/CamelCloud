@@ -14,6 +14,7 @@ export default new Vuex.Store({
       login: false,
       userId: undefined,
     },
+    locale: '',
   },
   mutations: {
     viewFilter(state, type) {
@@ -25,6 +26,9 @@ export default new Vuex.Store({
     },
     authType(state, data) {
       state.auth.type = data;
+    },
+    locale(state, lang) {
+      state.locale = lang;
     },
   },
   getters: {

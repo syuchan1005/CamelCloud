@@ -2,7 +2,7 @@
   <div class="check">
     <div class="empty">
       <md-spinner :md-size="150" :md-stroke="3" md-indeterminate/>
-      <div class="title">Checking...</div>
+      <div class="title">{{ $t('check.text') }}</div>
     </div>
   </div>
 </template>

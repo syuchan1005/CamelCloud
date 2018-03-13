@@ -4,17 +4,17 @@
     <div class="form">
       <form>
         <md-input-container>
-          <label>Username</label>
+          <label>{{ $t('username') }}</label>
           <md-input type="text" autocomplete="username" v-model="user.username" ref="id-input"/>
         </md-input-container>
         <md-input-container md-has-password>
-          <label>Password</label>
+          <label>{{ $t('password') }}</label>
           <md-input type="password" autocomplete="password" v-model="user.pass" @keyup.native.enter="downEnter" ref="pass-input"/>
         </md-input-container>
-        <md-button class="md-primary" @click="clickLogin" ref="login-button">Sign in or Sign up</md-button>
+        <md-button class="md-primary" @click="clickLogin" ref="login-button">{{ $t('hello.signBtn') }}</md-button>
       </form>
 
-      <div class="login-label" v-if="authList.length > 1">or sign in with</div>
+      <div class="login-label" v-if="authList.length > 1">{{ $t('hello.signWith') }}</div>
 
       <div class="auth" v-if="authList.length > 1">
         <div v-if="authList.includes('twitter')">
@@ -40,14 +40,24 @@
       </div>
     </div>
 
+    <md-button-toggle md-single>
+      <md-button :class="{ 'md-toggle': $store.state.locale === 'en'}" @click="$store.commit('locale', 'en')">
+        {{ $t('lang.en') }}
+      </md-button>
+      <md-button :class="{ 'md-toggle': $store.state.locale === 'ja'}" @click="$store.commit('locale', 'ja')">
+        {{ $t('lang.ja') }}
+      </md-button>
+    </md-button-toggle>
+
     <md-menu md-size="4" md-direction="top right" ref="menu">
       <md-button class="footer" md-menu-trigger>
-        Created by syu_chan_1005
+        {{ $t('hello.created', { author: 'syu_chan_1005'}) }}
       </md-button>
 
       <md-menu-content>
         <div class="author-card">
           <md-avatar class="md-large">
+            <!--suppress HtmlUnknownTarget -->
             <img src="@/assets/head.png" alt="syu_chan_1005" class="avatar">
           </md-avatar>
 

@@ -2,24 +2,24 @@
   <div class="setting">
     <router-link tag="md-button" to="/view" class="md-raised back">
       <md-icon>arrow_back</md-icon>
-      Back
+      {{ $t('setting.back') }}
     </router-link>
 
     <div class="holder username">
       <md-input-container>
-        <label>Username</label>
+        <label>{{ $t('username') }}</label>
         <md-input disabled v-model="user.username"/>
       </md-input-container>
     </div>
 
     <div class="holder password">
       <md-input-container>
-        <label>Password</label>
+        <label>{{ $t('password') }}</label>
         <md-input disabled v-model='user.password'/>
       </md-input-container>
       <md-button class="md-raised" @click="openChangeDialog">
         <md-icon>build</md-icon>
-        Change
+        {{ $t('setting.change') }}
       </md-button>
     </div>
 
@@ -34,7 +34,7 @@
           <md-icon>clear</md-icon>
         </div>
         <md-icon v-else>link</md-icon>
-        {{ user.twitterId ? 'unLink' : 'Link' }}
+        {{ user.twitterId ? $t('setting.unlink') : $t('setting.link') }}
       </md-button>
     </div>
 
@@ -49,7 +49,7 @@
           <md-icon>clear</md-icon>
         </div>
         <md-icon v-else>link</md-icon>
-        {{ user.facebookId ? 'unLink' : 'Link' }}
+        {{ user.facebookId ? $t('setting.unlink') : $t('setting.link') }}
       </md-button>
     </div>
 
@@ -64,20 +64,20 @@
           <md-icon>clear</md-icon>
         </div>
         <md-icon v-else>link</md-icon>
-        {{ user.instagramId ? 'unLink' : 'Link' }}
+        {{ user.instagramId ? $t('setting.unlink') : $t('setting.link') }}
       </md-button>
     </div>
 
     <md-dialog ref="changeDialog">
-      <md-dialog-title>Change Password</md-dialog-title>
+      <md-dialog-title>{{ $t('setting.passwd.title') }}</md-dialog-title>
 
       <md-dialog-content>
         <md-input-container>
-          <label>Old Password</label>
+          <label>{{ $t('setting.passwd.old') }}</label>
           <md-input type="password" v-model="dialog.oldPassword"/>
         </md-input-container>
         <md-input-container>
-          <label>New Password</label>
+          <label>{{ $t('setting.passwd.new') }}</label>
           <md-input type="password" v-model="dialog.newPassword"/>
         </md-input-container>
       </md-dialog-content>

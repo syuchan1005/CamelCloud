@@ -11,29 +11,32 @@
     <div class="empty-wrapper" v-if="!files.length">
       <div class="empty" @click="uploadFile" v-if="viewFilter === 'NORMAL'">
         <md-icon>library_books</md-icon>
-        <div class="title">Add your files</div>
+        <div class="title">{{ $t('explorer.add') }}</div>
 
         <md-button class="md-raised newDir" @click.stop="openNewDir">
           <md-icon>add</md-icon>
-          or create directory
+          {{ $t('explorer.createDirBtn') }}
         </md-button>
       </div>
       <div class="empty" v-if="viewFilter === 'TRASH'">
         <md-icon>delete_sweep</md-icon>
-        <div class="title">No Item</div>
+        <div class="title">{{ $t('explorer.empty') }}</div>
       </div>
     </div>
 
     <vue-perfect-scrollbar v-if="files.length" class="files-wrapper" @contextmenu.native.prevent="click($event)">
       <div class="files">
         <file v-if="$store.state.viewFilter === 'NORMAL'" v-for="(file, index) in files" :key="index" :name="file.name"
-              :type="file.type" :thumbnail-url="file.thumbnailUrl" @download="downloadFile(file)"
+              :type="file.type" :thumbnail-url="file.thumbnailUrl"
+              :download-text="$t('explorer.file.downloadText')" :move-text="$t('explorer.file.moveText')"
+              :rename-text="$t('explorer.file.renameText')" :remove-text="$t('explorer.file.removeText')"
               @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)" @rename="renameFile(file)"
-              @drop="dropDir($event, file)" @dragstart="dragFile = file" />
+              @download="downloadFile(file)" @drop="dropDir($event, file)" @dragstart="dragFile = file" />
         <file v-if="$store.state.viewFilter === 'TRASH'" v-for="(file, index) in files" :key="index" :name="file.name"
-              :type="file.type" :thumbnail-url="file.thumbnailUrl" @download="downloadFile(file)"
-              @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
-              remove-icon="delete_forever" remove-text="Delete" move-text="Restore"/>
+              :type="file.type" :thumbnail-url="file.thumbnailUrl"
+              @download="downloadFile(file)" @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
+              remove-icon="delete_forever" :remove-text="$t('explorer.file.deleteText')"
+              :move-text="$t('explorer.file.restoreText')" :download-text="$t('explorer.file.downloadText')" />
       </div>
     </vue-perfect-scrollbar>
 
@@ -44,25 +47,28 @@
       <md-menu-content>
         <md-menu-item @click="openNewDir">
           <md-icon>add</md-icon>
-          <span>Create New Folder</span>
+          <span>{{ $t('explorer.popup.createDir') }}</span>
         </md-menu-item>
       </md-menu-content>
     </md-menu>
 
     <!--suppress RequiredAttributes -->
     <md-dialog-prompt :md-title="dialog.title" :md-input-placeholder="dialog.placeholder"
-                      :md-ok-text="dialog.okText" @close="closeDialog" v-model="dialog.value" ref="dialog"/>
+                      :md-ok-text="dialog.okText" :md-cancel-text="$t('explorer.dialog.cancelText')" @close="closeDialog" v-model="dialog.value" ref="dialog"/>
 
     <select-directory-dialog v-model="dialog.path" @close="closeDialog"
                              :path-icon="separator.icon" :path-separator="separator.value"
+                             :title="$t('explorer.dialog.selectDir.title')" :ok-text="$t('explorer.dialog.selectDir.okText')"
+                             :cancel-text="$t('explorer.dialog.cancelText')"
                              ref="selDirDialog"/>
 
-    <md-dialog-confirm md-content="Are you sure you want to permanently delete trash folder?"
-                       md-title="Delete files" @close="emptyTrash" ref="confirmEmptyDialog"/>
+    <md-dialog-confirm :md-title="$t('explorer.dialog.emptyTrash.title')" :md-content="$t('explorer.dialog.emptyTrash.content')"
+                       :md-ok-text="$t('explorer.dialog.emptyTrash.okText')" :md-cancel-text="$t('explorer.dialog.cancelText')"
+                       @close="emptyTrash" ref="confirmEmptyDialog"/>
 
     <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)"
          @dragover.stop.prevent="$event.dataTransfer.dropEffect = 'copy'">
-      <div class="border">Drop to upload your files</div>
+      <div class="border">{{ $t('explorer.dropUpload') }}</div>
     </div>
   </div>
 </template>
@@ -183,7 +189,7 @@
       moveFile(file) {
         this.dialog = {
           op: 'MOVE',
-          okText: 'Move',
+          okText: this.$t('explorer.dialog.move.okText'),
           path: this.path.concat(),
           file: file.name,
           value: '',
@@ -193,9 +199,9 @@
       renameFile(file) {
         this.dialog = {
           op: 'RENAME',
-          title: 'Rename',
-          placeholder: 'Name',
-          okText: 'Rename',
+          title: this.$t('explorer.dialog.rename.title'),
+          placeholder: this.$t('explorer.dialog.rename.placeholder'),
+          okText: this.$t('explorer.dialog.rename.okText'),
           value: file.name,
           file: file.name,
         };
@@ -211,9 +217,9 @@
       openNewDir() {
         this.dialog = {
           op: 'MKDIR',
-          title: 'New Directory',
-          placeholder: 'DirectoryName',
-          okText: 'Create',
+          title: this.$t('explorer.dialog.mkdir.title'),
+          placeholder: this.$t('explorer.dialog.mkdir.placeholder'),
+          okText: this.$t('explorer.dialog.mkdir.okText'),
           value: '',
           file: undefined,
         };

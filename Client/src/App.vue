@@ -4,11 +4,11 @@
       <div class="title">CamelCloud</div>
       <router-link tag="md-button" class="md-raised" to="/setting">
         <md-icon>settings</md-icon>
-        Setting
+        {{ $t('app.setting') }}
       </router-link>
       <md-button class="md-raised" @click="clickLogout">
         <md-icon>exit_to_app</md-icon>
-        Logout
+        {{ $t('app.logout') }}
       </md-button>
     </div>
 
@@ -17,7 +17,7 @@
         <md-list-item @click="$store.commit('viewFilter', filter.name)"
                       :disabled="$store.state.viewFilter === filter.name">
           <md-icon>{{ filter.icon }}</md-icon>
-          <span>{{ filter.label }}</span>
+          <span>{{ $t(`app.${filter.label}`) }}</span>
         </md-list-item>
 
         <md-divider class="mobile" v-if="under480"/>
@@ -25,7 +25,7 @@
     </md-list>
 
     <div class="side-select" v-if="$route.meta.menu" v-show="!under800">
-      <div>Menu</div>
+      <div>{{ $t('app.menu') }}</div>
       <md-button-toggle md-single class="md-primary">
         <md-button class="md-icon-button" :class="{ 'md-toggle': list === 'left' }" @click="listSide = 'left'">
           <md-icon>keyboard_arrow_left</md-icon>
@@ -52,7 +52,7 @@
     <md-tabs md-centered class="md-transparent" data-side="center" v-if="$route.meta.menu && list === 'center'" @change="(index) => $store.commit('viewFilter', filters[index].name)">
       <md-tab v-for="(filter, index) in filters" :key="index"
               :md-active="$store.state.viewFilter === filter.name"
-              :md-label="filter.label" :md-icon="filter.icon" />
+              :md-label="$t(`app.${filter.label}`)" :md-icon="filter.icon" />
     </md-tabs>
 
     <vue-snotify></vue-snotify>
@@ -67,12 +67,12 @@
         listSide: 'left',
         filters: [
           {
-            label: 'Explorer',
+            label: 'explorer',
             icon: 'photo_library',
             name: 'NORMAL',
           },
           {
-            label: 'Trash',
+            label: 'trash',
             icon: 'delete',
             name: 'TRASH',
           },
