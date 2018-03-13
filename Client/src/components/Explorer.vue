@@ -1,5 +1,5 @@
 <template>
-  <div class="select-mode" @dragover.prevent="drag = true">
+  <div class="select-mode" @dragover.prevent="drag = $event.dataTransfer.items.length !== 0">
     <path-bar v-if="$store.state.viewFilter === 'NORMAL'"
               v-model="path" :icon="separator.icon" :separator="separator.value"
               @clickBack="backPath" @clickUploadFile="uploadFile" @clickNewFolder="openNewDir"
@@ -27,10 +27,13 @@
     <vue-perfect-scrollbar v-if="files.length" class="files-wrapper" @contextmenu.native.prevent="click($event)">
       <div class="files">
         <file v-if="$store.state.viewFilter === 'NORMAL'" v-for="(file, index) in files" :key="index" :name="file.name"
-              :type="file.type" :path="path" :view-filter="$store.state.viewFilter" :thumb="file.thumb" @download="downloadFile(file)"
-              @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)" @rename="renameFile(file)" />
-        <file v-if="$store.state.viewFilter === 'TRASH'"  v-for="(file, index) in files" :key="index" :name="file.name"
-              :type="file.type" :path="path" :view-filter="$store.state.viewFilter" :thumb="file.thumb" @download="downloadFile(file)"
+              :type="file.type" :path="path" :view-filter="$store.state.viewFilter" :thumb="file.thumb"
+              @download="downloadFile(file)"
+              @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)" @rename="renameFile(file)"
+              @drop="dropDir($event, file)" @dragstart="dragFile = file" />
+        <file v-if="$store.state.viewFilter === 'TRASH'" v-for="(file, index) in files" :key="index" :name="file.name"
+              :type="file.type" :path="path" :view-filter="$store.state.viewFilter" :thumb="file.thumb"
+              @download="downloadFile(file)"
               @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
               remove-icon="delete_forever" remove-text="Delete" move-text="Restore"/>
       </div>
@@ -54,12 +57,13 @@
 
     <select-directory-dialog v-model="dialog.path" @close="closeDialog"
                              :path-icon="separator.icon" :path-separator="separator.value"
-                             ref="selDirDialog" />
+                             ref="selDirDialog"/>
 
     <md-dialog-confirm md-content="Are you sure you want to permanently delete trash folder?"
                        md-title="Delete files" @close="emptyTrash" ref="confirmEmptyDialog"/>
 
-    <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)">
+    <div class="drag" v-if="drag" @dragleave.prevent="drag = false" @drop.prevent="dropFile($event)"
+         @dragover.stop.prevent="$event.dataTransfer.dropEffect = 'copy'">
       <div class="border">Drop to upload your files</div>
     </div>
   </div>
@@ -103,6 +107,7 @@
           icon: CommonConfig.separator.icon,
           value: CommonConfig.separator.value,
         },
+        dragFile: undefined,
       };
     },
     computed: {
@@ -272,6 +277,17 @@
           this.files = response.data.data.emptyTrash;
         });
       },
+      dropDir(event, file) {
+        this.$http({
+          method: 'post',
+          url: '/api',
+          data: {
+            query: `mutation{operateFile(data:{op:MOVE,path:"${this.path.join('/')}",source:"${this.dragFile.name}",target:"${this.path.join('/')}/${file.name}"}){type name thumb}}`,
+          },
+        }).then((response) => {
+          this.files = response.data.data.operateFile;
+        });
+      },
     },
   };
 </script>
@@ -279,6 +295,11 @@
 <style lang="scss" scoped>
   @import 'general';
   @import "variables";
+
+  [draggable] {
+    user-select: none;
+    user-drag: element;
+  }
 
   .md-menu {
     position: absolute;

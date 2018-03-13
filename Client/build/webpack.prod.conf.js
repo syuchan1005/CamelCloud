@@ -12,6 +12,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const loadMinified = require('./load-minified');
 
 const env = config.build.env;
@@ -105,7 +106,8 @@ const webpackConfig = merge(baseWebpackConfig, {
       staticFileGlobs: ['dist/**/*.{js,html,css,woff2,woff,ttf,eot}'],
       minify: true,
       stripPrefix: 'dist/'
-    })
+    }),
+    new HardSourceWebpackPlugin(),
   ]
 });
 

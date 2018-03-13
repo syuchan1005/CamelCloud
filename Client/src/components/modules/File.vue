@@ -1,7 +1,8 @@
 <template>
-  <div class="file" @click="$emit('click', $event)" @contextmenu.stop.prevent="$refs.menu.open()">
+  <div class="file" draggable="true" @click="$emit('click', $event)" @contextmenu.stop.prevent="$refs.menu.open()"
+       @dragover.prevent="setEffect($event)" @drop.prevent="$emit('drop', $event)" @dragstart="$emit('dragstart', $event)">
     <div class="image" v-if="type === 'FILE'">
-      <img v-if="hasThumbnail" :src="thumbnailURL"/>
+      <img v-if="hasThumbnail" draggable="false" :src="thumbnailURL"/>
       <icon v-else class="image file" name="file-o"/>
     </div>
     <icon class="image folder" v-else name="folder-open"/>
@@ -42,9 +43,6 @@
       name: {
         type: String,
       },
-      viewFilter: {
-        type: String,
-      },
       thumb: {
         type: Boolean,
         default: false,
@@ -52,6 +50,9 @@
       type: {
         type: String,
         default: 'FILE',
+      },
+      viewFilter: {
+        type: String,
       },
       downloadIcon: {
         type: String,
@@ -111,6 +112,10 @@
         // eslint-disable-next-line no-underscore-dangle
         return this._events[event] && this._events[event].length > 0;
       },
+      setEffect(event) {
+        // eslint-disable-next-line
+        event.dataTransfer.dropEffect = this.type === 'FILE' ? 'none' : 'move';
+      },
     },
   };
 </script>
@@ -127,6 +132,8 @@
     height: $size + 20px;
     max-height: $size + 20px;
     cursor: default;
+    user-select: none;
+    user-drag: element;
     @include disableSelect;
 
     &:hover {
