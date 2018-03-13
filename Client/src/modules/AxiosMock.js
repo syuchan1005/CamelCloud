@@ -4,23 +4,10 @@ class AxiosMock {
   constructor(axios) {
     this.mock = new MockAdapter(axios);
     this.authRoute();
+    this.graphQLRoute();
   }
 
-  authRoute() {
-    this.mock.onPost('/api/auth/local').reply((config) => {
-      const data = JSON.parse(config.data);
-      if (data.username === 'test' && data.password === '00602034e611c5c7e0c5b5e4fe6b8f27a0b7651ec26f55a0d76ffd9b7d21c276') { // name=test,pass=test
-        return [200];
-      }
-      return [500];
-    });
-    this.mock.onGet('/api/auth').reply(200, {
-      auth: true,
-      userId: 1,
-    });
-    this.mock.onGet('/api/logout').reply(302, {}, {
-      Location: '/',
-    });
+  graphQLRoute() {
     this.mock.onPost('/api').reply((config) => {
       let str = JSON.parse(config.data).query;
       const map = ['DIRECTORY', 'FILE', 'TRASH'];
@@ -48,6 +35,13 @@ class AxiosMock {
           return [200, { data: { user } }];
         } else if (query.files) {
           const files = [];
+          if (query.files.fileFilter !== 'DIRECTORY') {
+            files.push({
+              name: 'test.png',
+              type: 'FILE',
+              thumb: true,
+            });
+          }
           if (!query.files.fileFilter) {
             for (let i = 0; i < 10; i += 1) {
               files.push({
@@ -76,6 +70,25 @@ class AxiosMock {
         }
       }
       return [401];
+    });
+    this.mock.onGet('/api/files').replyOnce(200);
+    this.mock.onGet('/api/files').reply(404);
+  }
+
+  authRoute() {
+    this.mock.onPost('/api/auth/local').reply((config) => {
+      const data = JSON.parse(config.data);
+      if (data.username === 'test' && data.password === '00602034e611c5c7e0c5b5e4fe6b8f27a0b7651ec26f55a0d76ffd9b7d21c276') { // name=test,pass=test
+        return [200];
+      }
+      return [500];
+    });
+    this.mock.onGet('/api/auth').reply(200, {
+      auth: true,
+      userId: 1,
+    });
+    this.mock.onGet('/api/logout').reply(302, {}, {
+      Location: '/',
     });
   }
 

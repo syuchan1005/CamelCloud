@@ -27,13 +27,11 @@
     <vue-perfect-scrollbar v-if="files.length" class="files-wrapper" @contextmenu.native.prevent="click($event)">
       <div class="files">
         <file v-if="$store.state.viewFilter === 'NORMAL'" v-for="(file, index) in files" :key="index" :name="file.name"
-              :type="file.type" :path="path" :view-filter="$store.state.viewFilter" :thumb="file.thumb"
-              @download="downloadFile(file)"
+              :type="file.type" :thumbnail-url="file.thumbnailUrl" @download="downloadFile(file)"
               @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)" @rename="renameFile(file)"
               @drop="dropDir($event, file)" @dragstart="dragFile = file" />
         <file v-if="$store.state.viewFilter === 'TRASH'" v-for="(file, index) in files" :key="index" :name="file.name"
-              :type="file.type" :path="path" :view-filter="$store.state.viewFilter" :thumb="file.thumb"
-              @download="downloadFile(file)"
+              :type="file.type" :thumbnail-url="file.thumbnailUrl" @download="downloadFile(file)"
               @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
               remove-icon="delete_forever" remove-text="Delete" move-text="Restore"/>
       </div>
@@ -123,6 +121,15 @@
       }
     },
     watch: {
+      files(newFiles) {
+        return newFiles.map((file) => {
+          if (file.thumb) {
+            // eslint-disable-next-line
+            file.thumbnailUrl = `/api/file?path=${this.path.join('/')}/${file.name}${this.viewFilter === 'TRASH' ? '&folder=TRASH' : ''}`;
+          }
+          return file;
+        });
+      },
       path() {
         this.getFiles();
       },
@@ -295,11 +302,6 @@
 <style lang="scss" scoped>
   @import 'general';
   @import "variables";
-
-  [draggable] {
-    user-select: none;
-    user-drag: element;
-  }
 
   .md-menu {
     position: absolute;

@@ -2,7 +2,7 @@ import nodePath from 'path';
 import fs from 'fs-extra';
 import crypto from 'crypto';
 import ffmpeg from 'fluent-ffmpeg';
-import Util from "./Util";
+import Util from './Util';
 
 class Thumbnail {
   static createThumbnail(user, path, folderType) {
@@ -23,12 +23,12 @@ class Thumbnail {
     });
   }
 
-  static getFileName(path, folderType) {
-    return `${this.sha256(nodePath.posix.normalize(`${folderType || 'NORMAL'}/${nodePath.posix.normalize(`/${path}`)}`))}.png`;
+  static getFileName(path) {
+    return path;
   }
 
   static getFilePath(user, path, folderType) {
-    return nodePath.posix.normalize(`${Util.dirPath(user, 'THUMBNAIL')}/${Thumbnail.getFileName(path, (folderType || 'NORMAL'))}`);
+    return nodePath.posix.normalize(`${Util.dirPath(user, 'THUMBNAIL')}/${(folderType || 'NORMAL')}/${path}`);
   }
 
   static sha256(text) {

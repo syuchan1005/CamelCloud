@@ -6,7 +6,7 @@ import graphqlHTTP from 'koa-graphql';
 import Config from '../../config';
 import DBManager from './DBManager';
 import Thumbnail from './Thumbnail';
-import Util from "./Util";
+import Util from './Util';
 
 class GraphQL {
   constructor(dbManager) {
@@ -79,15 +79,12 @@ class GraphQL {
           await fs.ensureDir(`${Util.dirPath(user, 'NORMAL')}/${data.path}/${data.source}`);
           break;
         case 'RENAME': {
-          const beforePath = `${Util.dirPath(user, 'NORMAL')}/${data.path}/${data.source}`;
-          if (fs.statSync(beforePath).isFile()) {
-            await fs.move(
-              Thumbnail.getFilePath(user, `${data.path}/${data.source}`),
-              Thumbnail.getFilePath(user, `${data.path}/${data.target}`),
-            ).catch(() => undefined);
-          }
+          await fs.move(
+            Thumbnail.getFilePath(user, `${data.path}/${data.source}`),
+            Thumbnail.getFilePath(user, `${data.path}/${data.target}`),
+          ).catch(() => undefined);
           await fs.rename(
-            beforePath,
+            `${Util.dirPath(user, 'NORMAL')}/${data.path}/${data.source}`,
             `${Util.dirPath(user, 'NORMAL')}/${data.path}/${data.target}`,
           );
           break;
@@ -106,36 +103,28 @@ class GraphQL {
             }
             return Promise.reject(new Error('Failed'));
           } catch (err) {
-            const beforePath = `${Util.dirPath(user, 'NORMAL')}/${data.path}/${data.source}`;
-            if (fs.statSync(beforePath).isFile()) {
-              await fs.move(
-                Thumbnail.getFilePath(user, `${data.path}/${data.source}`),
-                Thumbnail.getFilePath(user, `${name}${i ? `(${i})` : ''}${suffix}`, 'TRASH'),
-              ).catch(() => undefined);
-            }
-            await fs.move(beforePath, err.path);
+            await fs.move(
+              Thumbnail.getFilePath(user, `${data.path}/${data.source}`),
+              Thumbnail.getFilePath(user, `${name}${i ? `(${i})` : ''}${suffix}`, 'TRASH'),
+            ).catch(() => undefined);
+            await fs.move(`${Util.dirPath(user, 'NORMAL')}/${data.path}/${data.source}`, err.path);
           }
           break;
         }
         case 'DELETE': {
           const deletePath = `${Util.dirPath(user, 'TRASH')}/${data.path}/${data.source}`;
-          if (fs.statSync(deletePath).isFile()) {
-            await fs.remove(Thumbnail.getFilePath(user, `${data.path}/${data.source}`, 'TRASH')).catch(() => undefined);
-          }
+          await fs.remove(Thumbnail.getFilePath(user, `${data.path}/${data.source}`, 'TRASH')).catch(() => undefined);
           await fs.remove(deletePath);
           folderType = 'TRASH';
           break;
         }
         case 'MOVE': {
-          const beforePath = `${Util.dirPath(user, data.sourceFolder)}/${data.path}/${data.source}`;
-          if (fs.statSync(beforePath).isFile()) {
-            await fs.move(
-              Thumbnail.getFilePath(user, `${data.path}/${data.source}`, data.sourceFolder),
-              Thumbnail.getFilePath(user, `${data.target}/${data.source}`, 'NORMAL'),
-            ).catch(() => undefined);
-          }
           await fs.move(
-            beforePath,
+            Thumbnail.getFilePath(user, `${data.path}/${data.source}`, data.sourceFolder),
+            Thumbnail.getFilePath(user, `${data.target}/${data.source}`, 'NORMAL'),
+          ).catch(() => undefined);
+          await fs.move(
+            `${Util.dirPath(user, data.sourceFolder)}/${data.path}/${data.source}`,
             `${Util.dirPath(user, 'NORMAL')}/${data.target}/${data.source}`,
           );
           folderType = data.sourceFolder;
