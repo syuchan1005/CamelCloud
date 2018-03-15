@@ -94,13 +94,12 @@ query = {
   path: String!,
 };
 */
-apiRouter.get('/file', async (ctx) => {
+apiRouter.get('/file/:path*', async (ctx) => {
   const body = ctx.query;
   body.type = body.type || 'THUMBNAIL';
   body.folder = body.folder || 'NORMAL';
   if (!body.path) {
-    ctx.throw(400, 'path Not Found');
-    return;
+    body.path = ctx.params.path;
   }
   const user = await db.getUser(ctx.state.user.userId);
   let root;
@@ -108,7 +107,7 @@ apiRouter.get('/file', async (ctx) => {
   switch (body.type) {
     case 'RAW': {
       path = body.path;
-      root = `${Util.dirPath(user, 'NORMAL')}/${body.folder}`;
+      root = Util.dirPath(user, body.folder);
       break;
     }
     case 'THUMBNAIL': {

@@ -31,7 +31,7 @@
               :download-text="$t('explorer.file.downloadText')" :move-text="$t('explorer.file.moveText')"
               :rename-text="$t('explorer.file.renameText')" :remove-text="$t('explorer.file.removeText')"
               @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)" @rename="renameFile(file)"
-              @download="downloadFile(file)" @drop="dropDir($event, file)" @dragstart="dragFile = file"/>
+              @download="downloadFile(file)" @drop="dropDir($event, file)" @dragstart="dragFile = file" @clickPreview="showMediaViewer(file)"/>
         <file v-if="$store.state.viewFilter === 'TRASH'" v-for="(file, index) in files" :key="index" :name="file.name"
               :type="file.type" :thumbnail-url="file.thumbnailUrl"
               @download="downloadFile(file)" @click="fileClick(file)" @move="moveFile(file)" @remove="removeFile(file)"
@@ -40,6 +40,7 @@
 
         <upload-file v-for="(file, index) in uploadFiles" :key="index" :name="file.name" :progress="file.progress"/>
       </div>
+      <media-viewer ref="mediaViewer" />
     </vue-perfect-scrollbar>
 
     <md-menu md-size="4" ref="menu" :style="menu">
@@ -86,6 +87,7 @@
   import UploadFile from './modules/UploadFile';
   import SelectDirectoryDialog from './modules/SelectDirectoryDialog';
   import PathBar from './modules/PathBar';
+  import MediaViewer from './modules/MediaViewer';
 
   export default {
     components: {
@@ -94,6 +96,7 @@
       VuePerfectScrollbar,
       SelectDirectoryDialog,
       PathBar,
+      MediaViewer,
     },
     name: 'explorer',
     title: 'Explorer',
@@ -322,6 +325,9 @@
         }).then((response) => {
           this.files = response.data.data.operateFile;
         });
+      },
+      showMediaViewer(file) {
+        this.$refs.mediaViewer.show(`/api/file${this.path.join('/')}/${file.name}?type=RAW${this.$store.state.viewFilter === 'TRASH' ? '&folder=TRASH' : ''}`);
       },
     },
   };

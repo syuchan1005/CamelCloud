@@ -1,11 +1,18 @@
 <template>
   <div class="file" :draggable="draggable" @click="$emit('click', $event)" @contextmenu.stop.prevent="$refs.menu.open()"
-       @dragover.prevent="setEffect($event)" @drop.prevent="$emit('drop', $event)" @dragstart="$emit('dragstart', $event)">
-    <div v-if="type === 'FILE'" class="image">
-      <img v-if="thumbnailUrl && !errorThumb" draggable="false" :src="thumbnailUrl" @error="errorThumb = true"/>
-      <icon v-else class="image file" :class="{ errorThumb }" name="file-o"/>
+       @dragover.prevent="setEffect($event)" @drop.prevent="$emit('drop', $event)"
+       @dragstart="dragStart($event)" @dragend="dragging = false">
+    <div class="image-wrapper">
+      <div v-if="type === 'FILE'" class="image">
+        <img v-if="thumbnailUrl && !errorThumb" draggable="false" :src="thumbnailUrl" @error="errorThumb = true"/>
+        <icon v-else class="file" :class="{ errorThumb }" name="file-o"/>
+      </div>
+      <icon v-else class="image folder" name="folder-open"/>
+
+      <md-icon v-if="type === 'FILE' && showButton('clickPreview')" class="md-size-2x preview" @click.native="$emit('clickPreview', $event)">
+        photo_size_select_large
+      </md-icon>
     </div>
-    <icon v-else class="image folder" name="folder-open"/>
     <div class="name">{{ name }}</div>
 
     <md-menu md-size="4" ref="menu">
@@ -88,6 +95,7 @@
     data() {
       return {
         errorThumb: false,
+        dragging: false,
       };
     },
     methods: {
@@ -97,7 +105,11 @@
       },
       setEffect(event) {
         // eslint-disable-next-line no-param-reassign
-        event.dataTransfer.dropEffect = this.type === 'FILE' ? 'none' : 'move';
+        event.dataTransfer.dropEffect = this.type === 'FILE' || this.dragging ? 'none' : 'move';
+      },
+      dragStart(event) {
+        this.$emit('dragstart', event);
+        this.dragging = true;
       },
     },
   };
@@ -124,27 +136,45 @@
     }
   }
 
-  .image {
-    width: $size;
-    min-width: $size;
-    height: $size;
-    text-align: center;
-    padding: 5px;
+  .image-wrapper {
+    position: relative;
 
-    &.folder {
-      color: $mainColor;
-      padding-left: 10px;
+    .image {
+      width: $size;
+      min-width: $size;
+      height: $size;
+      text-align: center;
+      padding: 5px;
+
+      &.folder {
+        color: $mainColor;
+        padding-left: 10px;
+      }
+
+      .file {
+        color: ($mainColor + $subColor) / 2;
+        width: $size * 0.9;
+        min-width: $size * 0.8;
+        height: $size * 0.8;
+
+        &.errorThumb {
+          color: $errorColor;
+        }
+      }
     }
 
-    .file {
-      color: ($mainColor + $subColor) / 2;
-      width: $size * 0.9;
-      min-width: $size * 0.9;
-      height: $size * 0.9;
+    &:hover > .preview {
+      display: block;
+    }
 
-      &.errorThumb {
-        color: $errorColor;
-      }
+    .preview {
+      display: none;
+      position: absolute;
+      top: $size / 4;
+      left: $size / 4;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.54);
+      border-radius: 5px;
     }
   }
 
